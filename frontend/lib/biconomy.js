@@ -1,35 +1,67 @@
 import { Bundler } from "@biconomy/bundler";
-import { Paymaster, createSmartAccountClient, DEFAULT_ENTRYPOINT_ADDRESS, ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from "@biconomy/account";
-import { sepolia } from "viem/chains";
+import {
+  Paymaster,
+  createSmartAccountClient,
+  DEFAULT_ENTRYPOINT_ADDRESS,
+  ECDSAOwnershipValidationModule,
+  DEFAULT_ECDSA_OWNERSHIP_MODULE,
+} from "@biconomy/account";
+import { baseSepolia } from "viem/chains";
 
+// Initialize Bundler with explicit entry point
 const bundler = new Bundler({
   bundlerUrl: process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL,
-  chainId: sepolia.id, // Replace this with your desired network
-  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS, // This is a Biconomy constant
+  chainId: baseSepolia.id,
+  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
 });
 
+// Initialize Paymaster
 const paymaster = new Paymaster({
   paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL,
 });
 
+// Create Validation Module
 const createValidationModule = async (signer) => {
-  return await ECDSAOwnershipValidationModule.create({
-    signer: signer,
-    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE, // This is a Biconomy constant
-  });
+  try {
+    return await ECDSAOwnershipValidationModule.create({
+      signer: signer,
+      moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+    });
+  } catch (error) {
+    console.error("Error creating validation module:", error);
+    throw error;
+  }
 };
 
+// Create Smart Account
 export const createSmartAccount = async (walletClient) => {
-  const validationModule = await createValidationModule(walletClient);
-  console.log('creating')
+  try {
+    if (!walletClient) {
+      throw new Error("Wallet client is required");
+    }
 
-  return await createSmartAccountClient({
-    signer: walletClient,
-    chainId: sepolia.id, // Replace this with your target network
-    bundler: bundler, // Use the `bundler` we initialized above
-    paymaster: paymaster, // Use the `paymaster` we initialized above
-    entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS, // This is a Biconomy constant
-    defaultValidationModule: validationModule, // Use the `validationModule` we initialized above
-    activeValidationModule: validationModule, // Use the `validationModule` we initialized above
-  });
+    const validationModule = await createValidationModule(walletClient);
+    console.log("Validation module created:", validationModule);
+
+    const smartAccount = await createSmartAccountClient({
+      signer: walletClient,
+      chainId: baseSepolia.id,
+      bundler: bundler,
+      paymaster: paymaster,
+      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+      defaultValidationModule: validationModule,
+      activeValidationModule: validationModule,
+    });
+
+    // Initialize the account if not already deployed
+    if (!smartAccount.isDeployed()) {
+      console.log("Smart account not deployed, initializing...");
+      await smartAccount.init();
+    }
+
+    return smartAccount;
+  } catch (error) {
+    console.error("Error creating smart account:", error);
+    throw error;
+  }
 };

@@ -1,4 +1,6 @@
+// app/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   DynamicWidget,
@@ -10,6 +12,8 @@ import Button from "./components/Button";
 import Link from "next/link";
 import Spinner from "./Spinner";
 import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
+import dynamic from 'next/dynamic';
+import EventTicketing from "./components/EventTicketing";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
@@ -19,14 +23,12 @@ export default function Main() {
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
-    
     const signIn = async () => {
       if (!user) {
         await telegramSignIn({ forceCreateUser: true });
       }
       setIsLoading(false);
     };
-    
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
@@ -47,6 +49,12 @@ export default function Main() {
         <div className="mt-6">
           {isLoading ? <Spinner /> : <DynamicWidget />}
         </div>
+
+        {smartAccount && (
+          <div className="mt-8 w-full max-w-4xl">
+            <EventTicketing smartAccount={smartAccount} />
+          </div>
+        )}
       </div>
     </div>
   );
