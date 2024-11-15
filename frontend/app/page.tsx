@@ -9,24 +9,32 @@ import Image from "next/image";
 import Button from "./components/Button";
 import Link from "next/link";
 import Spinner from "./Spinner";
+import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
-
+    
     const signIn = async () => {
       if (!user) {
         await telegramSignIn({ forceCreateUser: true });
       }
       setIsLoading(false);
     };
-
+    
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
+
+  useEffect(() => {
+    if (smartAccount) {
+      console.log('My Biconomy smart account', smartAccount);
+    }
+  }, [smartAccount]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center text-white">
@@ -36,7 +44,6 @@ export default function Main() {
             <div className="flex space-x-4"></div>
           </div>
         </div>
-
         <div className="mt-6">
           {isLoading ? <Spinner /> : <DynamicWidget />}
         </div>

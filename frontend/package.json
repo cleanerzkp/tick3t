@@ -28,7 +28,6 @@
     "eslint-config-next": "13.4.19",
     "ethers": "^6.13.3",
     "jsonwebtoken": "^9.0.2",
-    "next": "^14.2.15",
     "pino-pretty": "^10.0.0",
     "postcss": "^8.4.47",
     "react": "18.2.0",
@@ -45,6 +44,9 @@
     "rpc-websockets": "7.10.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.6"
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "@types/jsonwebtoken": "^9.0.6",
+    "next": "^15.0.3"
   }
 }
