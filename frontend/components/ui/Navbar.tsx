@@ -25,6 +25,7 @@ export default function Navbar() {
               </div>
 
               <div className="flex items-center gap-4">
+                <div className="">Create Event</div>
                 <Avatar>
                   <AvatarImage
                     src="https://github.com/shadcn.png"
