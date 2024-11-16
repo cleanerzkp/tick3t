@@ -5,17 +5,11 @@ const config = require("../config");
 const { generateTelegramHash, sendToChannelTopic } = require("../utils/helper");
 
 const welcomeMessage = `
-*Welcome to Tick3t! 🐝✨*
+*Welcome to Tick3t! 🚀*
 
-*Tick3t* makes it *super easy* to place fun wagers with just a few taps. You can either join a cozy *hive of friends* for some friendly competition, or dive into the buzz of a *big crowd* to test your instincts!
+*Tick3t* makes it *super easy* to buy sell tick3ts and manage events!
 
-💡 *Check out our betting channels:*
-
-
-*Win and you'll get honey! 🍯*  
-*Lose and you'll get stung! 🐝*
-
-*Are you ready to play? 🕹️*
+Use /help to see available commands.
 `;
 
 async function sendImageToChat(ctx, chatId, imagePath, caption = "") {
@@ -79,7 +73,7 @@ exports.handleStart = async (ctx) => {
       ...userData,
       hash,
     },
-    config.BOT_TOKEN,
+    config.TELEGRAM_BOT_TOKEN,
     { algorithm: "HS256" }
   );
   console.log("[DEBUG] JWT generated for user", userData);
@@ -94,23 +88,8 @@ exports.handleStart = async (ctx) => {
         [
           {
             text: "Open Mini Web App 🚀",
-            url: `${config.TICK3T_APP_URL}?telegramAuthToken=${encodedTelegramAuthToken}&cid=${encodedChatId}`,
-          },
-        ],
-        [
-          {
-            text: `Your chat id: ${chatId}`,
-            url: `${config.TICK3T_APP_URL}?telegramAuthToken=${encodedTelegramAuthToken}&cid=${encodedChatId}`,
-          },
-        ],
-        [
-          {
-            text: "Create 🆕",
-            url: `https://${config.TICK3T_APP_URL_CREATE}?startapp=${encodedChatId}`,
-          },
-          {
-            text: "Join 🤝",
-            url: `https://${config.TICK3T_APP_URL_JOIN}?startapp=${encodedChatId}`,
+            url: `t.me/tick3tapp_bot/tick3t`,
+            // url: `${config.TICK3T_APP_URL}?telegramAuthToken=${encodedTelegramAuthToken}&cid=${encodedChatId}`,
           },
         ],
       ],
@@ -127,10 +106,10 @@ exports.handleStart = async (ctx) => {
     }
   );
 
-  const imagePath = path.join(__dirname, "..", config.IMAGE_PATH);
-  const caption = "Response message";
+  // const imagePath = path.join(__dirname, "..", config.IMAGE_PATH);
+  // const caption = "Response message";
 
-  await sendImageToChat(ctx, chatId, imagePath, caption);
+  // await sendImageToChat(ctx, chatId, imagePath, caption);
 };
 
 exports.handleTestMessage = async (ctx) => {
