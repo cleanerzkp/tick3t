@@ -107,11 +107,12 @@ export default function Main() {
                   {isLoading ? (
                     <>
                       <Spinner />
-                      <p>Loading Dynamic Widget...</p>
+                      <p>Loading wallet...</p>
                     </>
                   ) : (
                     <>
-                      <DynamicWidget />
+                      {" "}
+                      <DynamicWidget />{" "}
                     </>
                   )}
                 </div>

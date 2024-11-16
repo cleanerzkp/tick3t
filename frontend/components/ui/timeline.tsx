@@ -41,13 +41,39 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
   const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  const handleNavigateClick = () => {
+    try {
+      const formattedLocations = data[0].events
+        .map((event: EventItem) => {
+          if (!event?.location) return null;
+          // Remove special characters and properly format the location
+          return event.location
+            .trim()
+            .replace(/[^\w\s,-]/g, "")
+            .replace(/\s+/g, "+");
+        })
+        .filter(Boolean)
+        .join("/");
 
+      if (!formattedLocations) {
+        throw new Error("No valid locations found");
+      }
+
+      const mapsUrl = `https://www.google.com/maps/dir/${formattedLocations}`;
+
+      // Open in new tab with safety checks
+      const newWindow = window.open(mapsUrl, "_blank", "noopener,noreferrer");
+      if (newWindow) newWindow.focus();
+    } catch (err) {
+      console.error("Navigation error:", err);
+    }
+  };
   return (
     <div
       className="w-full  bg-neutral-950 font-sans md:px-10"
       ref={containerRef}
     >
-      <div className="max-w-7xl   pt-20 px-4 md:px-8 lg:px-10">
+      <div className="max-w-7xl text-start  pt-20 px-4 md:px-8 lg:px-10">
         <h2 className="text-4xl mb-4 flex font-sans font-bold   text-[#ffffff90] max-w-4xl">
           Events
         </h2>
@@ -69,8 +95,24 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
             </div>
 
             <div className="relative pl-12 pr-4 md:pl-4 w-full text-neutral-400">
-              <h3 className="md:hidden block pl-1  text-2xl mb-4 text-left font-bold  text-neutral-500">
-                {item.date}
+              <h3 className="md:hidden   pl-1 flex flex-row justify-between text-2xl mb-4 text-left font-bold  text-neutral-500">
+                {item.date}{" "}
+                <button
+                  className={`
+          text-[#ffffff90]  text-base
+          transition-colors duration-200
+          disabled:opacity-50 disabled:cursor-not-allowed
+          focus:outline-none focus:ring-2 focus:ring-white/50
+          px-3 py-1 rounded flex flex-row items-center gap-1
+        `}
+                  onClick={handleNavigateClick}
+                  aria-label="Open locations in Google Maps"
+                >
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/3/39/Google_Maps_icon_%282015-2020%29.svg"
+                    className="h-7 w-7"
+                  />
+                </button>
               </h3>
               <div className="flex gap-3 flex-col">
                 {item.events.map((eventItem, index) => (
