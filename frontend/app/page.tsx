@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card";
 import Navbar from "@/components/ui/Navbar";
 import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import EventTicketing from "./components/EventTicketing";
 
 export default function Main() {
@@ -42,12 +42,13 @@ export default function Main() {
       }
       setIsLoading(false);
     };
+    console.log("user", user);
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
   useEffect(() => {
     if (smartAccount) {
-      console.log('My Biconomy smart account', smartAccount);
+      console.log("My Biconomy smart account", smartAccount);
     }
   }, [smartAccount]);
 
@@ -56,7 +57,7 @@ export default function Main() {
       {/* <div className="text-[#fff] font-Ubuntu bg-[url('/bg.png')] bg-contain bg-no-repeat bg-center    grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8  mx-auto "></div> */}
       <Navbar />
       <div className="flex flex-col items-center justify-center text-center">
-       <AuroraBackground>
+        <AuroraBackground>
           <motion.div
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -69,12 +70,12 @@ export default function Main() {
           >
             <Card
               className={cn(
-                "w-[380px] bg-transparent backdrop-blur-xl shadow-xl text-[#ffffff] border-[#ffffff90] border-[1px]"
+                "w-[380px] bg-transparent   text-[#ffffff] border-[#ffffff90] border-none"
               )}
             >
               <CardHeader>
                 <CardTitle>
-                  <div className="text-3xl font-sans md:text-7xl font-bold text-white text-center">
+                  <div className="text-3xl font-sans md:text-7xl font-bold text-[#ffffff99] text-center">
                     Welcome to Tick3t
                   </div>
                 </CardTitle>
