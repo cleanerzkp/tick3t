@@ -14,7 +14,7 @@ unverifiedEmail.dnsRecords = [hackedDns]
 const vlayer = createVlayerClient({url:"https://test-prover.vlayer.xyz"});
 
 const hash = await vlayer.prove({
-  address: "0x38B00d0ba50f32f85883033F63B042750f33d057", // Address as string
+  address: "0xab7087b2d91341E7540CCCC04B6EFD83C86188d1", // Address as string
   proverAbi: emailProverAbi.abi,
   functionName: "main",
   args: [unverifiedEmail],
