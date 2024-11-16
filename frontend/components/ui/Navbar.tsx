@@ -15,13 +15,13 @@ import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 export default function Navbar() {
   const { sdkHasLoaded, user, handleLogOut } = useDynamicContext();
   const [isLogin, setIsLogin] = useState(false);
-  
+
   useEffect(() => {
     if (user) {
       setIsLogin(true);
     }
   }, [user]);
-  
+
   const navigate = useRouter();
 
   return (
@@ -48,9 +48,7 @@ export default function Navbar() {
               )}
 
               {/* Wallet Section */}
-              <div className="relative">
-                <DynamicWidget />
-              </div>
+              <div className="relative">{/* <DynamicWidget /> */}</div>
 
               {/* Profile Section */}
               {isLogin && (
