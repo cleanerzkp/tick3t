@@ -75,6 +75,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
               <div className="flex gap-3 flex-col">
                 {item.events.map((eventItem, index) => (
                   <BackgroundGradient
+                    key={index}
                     animate={false}
                     className="rounded-[8px]  max-w-sm p-4 sm:p-10  bg-zinc-900"
                   >
