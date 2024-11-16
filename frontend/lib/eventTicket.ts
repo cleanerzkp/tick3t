@@ -5,13 +5,13 @@ import type { EventInfo, TransactionResult } from "@/app/types/eventTicket";
 import type { BiconomySmartAccountV2 } from "@biconomy/account";
 import eventticketingtest2 from "../../contracts/abis/EventTicketingTest2.json";
 
-// Contract address from environment variable
+// Contract address
 const CONTRACT_ADDRESS = "0x7133CF0D4597F39FFA0E5Dd19144800FD49EC47B";
 
-// Initialize public client for read operations
+// Public client for read operations
 const publicClient = createPublicClient({
   chain: baseSepolia,
-  transport: http()
+  transport: http(),
 });
 
 class EventTicketContract {
@@ -25,6 +25,7 @@ class EventTicketContract {
     return EventTicketContract.instance;
   }
 
+  // Fetch event info
   public async getEventInfo(): Promise<EventInfo> {
     try {
       if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
@@ -32,60 +33,63 @@ class EventTicketContract {
       const data = await publicClient.readContract({
         address: CONTRACT_ADDRESS as Address,
         abi: eventticketingtest2,
-        functionName: 'getEventInfo',
+        functionName: "getEventInfo",
       }) as unknown as EventInfo;
 
       return data;
     } catch (error) {
-      console.error('Error fetching event info:', error);
+      console.error("Error fetching event info:", error);
       throw error;
     }
   }
 
+  // Buy ticket
   public async buyTicket(smartAccount: BiconomySmartAccountV2): Promise<TransactionResult> {
     try {
       if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
       if (!smartAccount) throw new Error("Smart account not initialized");
 
-      // Add debug logs
-      console.log("Starting buyTicket process...");
-      console.log("Smart Account:", smartAccount);
-      console.log("Contract Address:", CONTRACT_ADDRESS);
+      const senderAddress = await smartAccount.getAccountAddress();
+      console.log("Sender Address:", senderAddress);
 
       const data = encodeFunctionData({
         abi: eventticketingtest2,
-        functionName: 'buy',
+        functionName: "buy",
       });
 
       const tx = {
         to: CONTRACT_ADDRESS as Address,
         data: data,
         value: BigInt("10000000000000000"), // 0.01 ETH in wei
+        // Removed 'sender' as it's managed by the SDK
       };
 
-      // Debug log for transaction
       console.log("Transaction data:", tx);
 
       // Build user operation
       const userOp = await smartAccount.buildUserOp([tx]);
       console.log("Built userOp:", userOp);
 
-      // Verify paymaster exists
+      // Ensure paymaster is initialized
       if (!smartAccount.paymaster) {
         throw new Error("Paymaster not initialized in smart account");
       }
 
-      // Get paymaster data
+      // Fetch paymaster and data
       const paymasterAndDataResponse = await smartAccount.paymaster.getPaymasterAndData(userOp);
       console.log("Paymaster response:", paymasterAndDataResponse);
 
+      if (!paymasterAndDataResponse || !paymasterAndDataResponse.paymasterAndData) {
+        throw new Error("Paymaster failed to return valid data");
+      }
+
       userOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-      // Send the operation
+      // Send the user operation
       const userOpResponse = await smartAccount.sendUserOp(userOp);
       console.log("UserOp Response:", userOpResponse);
 
-      // Wait for transaction
+      // Wait for the transaction to complete
       const transactionDetails = await userOpResponse.wait();
       console.log("Transaction Details:", transactionDetails);
 
@@ -94,22 +98,11 @@ class EventTicketContract {
         userOpHash: userOpResponse.userOpHash,
         transactionHash: transactionDetails.receipt.transactionHash,
       };
-
     } catch (error) {
-      // Improved error handling
-      console.error('Error buying ticket:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
-
+      console.error("Error buying ticket:", error);
       return {
         success: false,
-        error: error instanceof Error 
-          ? error.message 
-          : typeof error === 'object' && error !== null 
-            ? JSON.stringify(error) 
-            : 'Unknown error occurred',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }

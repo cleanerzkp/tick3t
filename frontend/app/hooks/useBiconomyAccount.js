@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useState, useEffect, useCallback } from "react";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { createSmartAccount } from "../../lib/biconomy";
 
 export function useBiconomyAccount() {
@@ -12,8 +12,8 @@ export function useBiconomyAccount() {
       return;
     }
 
-    if(!primaryWallet.connector.isEmbeddedWallet) {
-      alert('No embedded wallet selected');
+    if (!primaryWallet.connector.isEmbeddedWallet) {
+      alert("No embedded wallet selected");
       return;
     }
 
@@ -24,7 +24,7 @@ export function useBiconomyAccount() {
         setSmartAccount(newSmartAccount);
       }
     } catch (error) {
-      console.error('Error fetching wallet clients or creating smart account:', error);
+      console.error("Error fetching wallet clients or creating smart account:", error);
     }
   }, [primaryWallet, smartAccount]);
 
