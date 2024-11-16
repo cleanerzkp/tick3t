@@ -121,7 +121,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
             <p className="text-gray-300 mb-4">
               {new Date(Number(eventInfo.time) * 1000).toLocaleString()}
             </p>
-            
+  
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-gray-700 p-4 rounded-lg">
                 <p className="text-sm text-gray-300">Available Tickets</p>
@@ -136,7 +136,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
                 </p>
               </div>
             </div>
-
+  
             <button
               onClick={handleBuyTicket}
               disabled={isBuying || eventInfo.n_tickets_sold >= eventInfo.n_tickets}
@@ -158,24 +158,40 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
               )}
             </button>
           </div>
-
+  
           {error && (
             <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mt-4">
               {error}
             </div>
           )}
-
+  
           {(transactionHash || userOpHash) && (
             <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded-lg mt-4">
               <div className="font-semibold mb-2">Transaction Successful!</div>
               {transactionHash && (
                 <div className="text-sm">
-                  Transaction Hash: {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
+                  Transaction Hash:{" "}
+                  <a
+                    href={`https://base-sepolia.blockscout.com/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
+                  </a>
                 </div>
               )}
               {userOpHash && (
                 <div className="text-sm mt-2">
-                  User Operation Hash: {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
+                  User Operation Hash:{" "}
+                  <a
+                    href={`https://base-sepolia.blockscout.com/userOp/${userOpHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
+                  </a>
                 </div>
               )}
             </div>
