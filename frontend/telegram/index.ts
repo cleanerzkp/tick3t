@@ -1,17 +1,15 @@
 const { Telegraf } = require("telegraf");
 const { TELEGRAM_BOT_TOKEN, WEBAPP_URL } = require("./config");
-
+const { handleStart, handleTestMessage } = require("./handlers/commands");
 if (!TELEGRAM_BOT_TOKEN) {
   throw new Error("TELEGRAM_BOT_TOKEN must be provided!");
 }
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
-
+bot.start(handleStart);
 // Basic commands
 bot.command("start", (ctx: any) => {
-  ctx.reply(
-    "Welcome to TaskVaultBot! 🚀\nUse /help to see available commands."
-  );
+  ctx.reply("Welcome to Tick3t! 🚀\nUse /help to see available commands.");
 });
 
 bot.command("help", (ctx: any) => {
