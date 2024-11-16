@@ -35,9 +35,13 @@ const hash = await vlayer.prove({
   args: [unverifiedEmail],
 });
 
+await new Promise((resolve) => setTimeout(resolve, 10000));
+
 const result = await vlayer.waitForProvingResult(hash);
 console.log("Proof:", result[0]);
 console.log("Verifying...");
+
+await new Promise((resolve) => setTimeout(resolve, 10000));
 
 const txHash = await ethClient.writeContract({
   address: "0xa827c4f310f76fb31b2864e3de2ad20f713cd307",
@@ -47,6 +51,8 @@ const txHash = await ethClient.writeContract({
   chain,
   account: account,
 });
+
+await new Promise((resolve) => setTimeout(resolve, 10000));
 
 await ethClient.waitForTransactionReceipt({
   hash: txHash,
