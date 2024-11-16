@@ -72,7 +72,7 @@ contract EventTicketing is ERC721, Verifier {
 
     event TicketMinted(address to, uint256 tokenId, uint256 ticketNumber);
 
-    EmailProver emailProver;
+    EmailProver public emailProver;
     string public emailRegex;
 
     constructor(

@@ -1,0 +1,6 @@
+{
+    "name": "email-proof-generator",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "generate_email_proof.js"
+  }

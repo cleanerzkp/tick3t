@@ -7,12 +7,14 @@ const email = fs.readFileSync("mail.eml").toString();
 
 // Prepare the email for verification
 const unverifiedEmail = await preverifyEmail(email);
+const hackedDns = 'v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCPwsG12awgnJc3oDr984Y5bVhgJ+EPiGlPqGD+IwD/iVz80hI9o3AVfEjmUgHxCToZsuRxs6dez3TDD1wYRiWcNlmgcEy68IxuAf4nAGxmAueSKRYoencKlH5Bn5XDnQDlnZbr7WWsKlBoDfb2lhK+WSxmDm4oo7Zh+qxzh45elwIDAQAB; n=1024,1450901090,1466712290'
+unverifiedEmail.dnsRecords = [hackedDns]
 
 // Create vlayer server client
-const vlayer = createVlayerClient();
+const vlayer = createVlayerClient({url:"https://test-prover.vlayer.xyz"});
 
 const hash = await vlayer.prove({
-  address: 0x38B00d0ba50f32f85883033F63B042750f33d057,
+  address: "0xab7087b2d91341E7540CCCC04B6EFD83C86188d1", // Address as string
   proverAbi: emailProverAbi.abi,
   functionName: "main",
   args: [unverifiedEmail],
