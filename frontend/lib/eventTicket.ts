@@ -1,14 +1,17 @@
+// lib/contracts/eventTicket.ts
 import { encodeFunctionData, createPublicClient, http, Address } from "viem";
 import { baseSepolia } from "viem/chains";
 import type { EventInfo, TransactionResult } from "@/app/types/eventTicket";
-import { createNexusClient, createBicoPaymasterClient } from "@biconomy/sdk";
+import type { BiconomySmartAccountV2 } from "@biconomy/account";
 import eventticketingtest2 from "../../contracts/abis/EventTicketingTest2.json";
 
+// Contract address
 const CONTRACT_ADDRESS = "0x7133CF0D4597F39FFA0E5Dd19144800FD49EC47B";
 
+// Public client for read operations
 const publicClient = createPublicClient({
   chain: baseSepolia,
-  transport: http()
+  transport: http(),
 });
 
 class EventTicketContract {
@@ -22,6 +25,7 @@ class EventTicketContract {
     return EventTicketContract.instance;
   }
 
+  // Fetch event info
   public async getEventInfo(): Promise<EventInfo> {
     try {
       if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
@@ -29,100 +33,76 @@ class EventTicketContract {
       const data = await publicClient.readContract({
         address: CONTRACT_ADDRESS as Address,
         abi: eventticketingtest2,
-        functionName: 'getEventInfo',
+        functionName: "getEventInfo",
       }) as unknown as EventInfo;
 
       return data;
     } catch (error) {
-      console.error('Error fetching event info:', error);
+      console.error("Error fetching event info:", error);
       throw error;
     }
   }
 
-  public async buyTicket(walletClient: any): Promise<TransactionResult> {
+  // Buy ticket
+  public async buyTicket(smartAccount: BiconomySmartAccountV2): Promise<TransactionResult> {
     try {
       if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
-      if (!walletClient) throw new Error("Wallet client not initialized");
+      if (!smartAccount) throw new Error("Smart account not initialized");
 
-      console.log("Starting buyTicket process with wallet client:", walletClient);
+      const senderAddress = await smartAccount.getAccountAddress();
+      console.log("Sender Address:", senderAddress);
 
-      // Create Nexus client
-      const nexusClient = await createNexusClient({
-        signer: walletClient,
-        chain: baseSepolia,
-        transport: http(),
-        bundlerTransport: http(process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL || ""),
-        paymaster: createBicoPaymasterClient({
-          paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL || ""
-        })
+      const data = encodeFunctionData({
+        abi: eventticketingtest2,
+        functionName: "buy",
       });
 
-      console.log("Nexus client created");
+      const tx = {
+        to: CONTRACT_ADDRESS as Address,
+        data: data,
+        value: BigInt("10000000000000000"), // 0.01 ETH in wei
+        // Removed 'sender' as it's managed by the SDK
+      };
 
-      // Estimate gas first
-      const gasEstimates = await nexusClient.estimateUserOperationGas({
-        calls: [{
-          to: CONTRACT_ADDRESS,
-          data: encodeFunctionData({
-            abi: eventticketingtest2,
-            functionName: 'buy',
-          }),
-          value: BigInt("10000000000000000"), // 0.01 ETH in wei
-        }]
-      });
+      console.log("Transaction data:", tx);
 
-      console.log("Gas estimates:", gasEstimates);
+      // Build user operation
+      const userOp = await smartAccount.buildUserOp([tx]);
+      console.log("Built userOp:", userOp);
 
-      // Send the transaction
-      const hash = await nexusClient.sendTransaction({
-        calls: [{
-          to: CONTRACT_ADDRESS,
-          data: encodeFunctionData({
-            abi: eventticketingtest2,
-            functionName: 'buy',
-          }),
-          value: BigInt("10000000000000000"), // 0.01 ETH in wei
-        }]
-      });
+      // Ensure paymaster is initialized
+      if (!smartAccount.paymaster) {
+        throw new Error("Paymaster not initialized in smart account");
+      }
 
-      console.log("Transaction hash:", hash);
+      // Fetch paymaster and data
+      const paymasterAndDataResponse = await smartAccount.paymaster.getPaymasterAndData(userOp);
+      console.log("Paymaster response:", paymasterAndDataResponse);
 
-      // Wait for the transaction receipt
-      const receipt = await nexusClient.waitForUserOperationReceipt({ 
-        hash,
-        timeout: 30000, // 30 seconds
-        pollingInterval: 2000, // Poll every 2 seconds
-      });
+      if (!paymasterAndDataResponse || !paymasterAndDataResponse.paymasterAndData) {
+        throw new Error("Paymaster failed to return valid data");
+      }
 
-      console.log("Transaction receipt:", receipt);
+      userOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-      // Get user operation details
-      const userOpDetails = await nexusClient.getUserOperation({
-        hash: receipt.userOpHash
-      });
+      // Send the user operation
+      const userOpResponse = await smartAccount.sendUserOp(userOp);
+      console.log("UserOp Response:", userOpResponse);
 
-      console.log("User operation details:", userOpDetails);
+      // Wait for the transaction to complete
+      const transactionDetails = await userOpResponse.wait();
+      console.log("Transaction Details:", transactionDetails);
 
       return {
         success: true,
-        transactionHash: receipt.receipt.transactionHash,
-        userOpHash: receipt.userOpHash
+        userOpHash: userOpResponse.userOpHash,
+        transactionHash: transactionDetails.receipt.transactionHash,
       };
-
     } catch (error) {
-      console.error('Error buying ticket:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
-
+      console.error("Error buying ticket:", error);
       return {
         success: false,
-        error: error instanceof Error 
-          ? error.message 
-          : typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
-            : 'Unknown error occurred',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }

@@ -1,6 +1,4 @@
-// app/page.tsx
 "use client";
-
 import { useEffect, useState } from "react";
 import {
   DynamicWidget,
@@ -9,52 +7,62 @@ import {
 } from "../lib/dynamic";
 import Spinner from "./Spinner";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-
-import { AuroraBackground } from "../components/ui/aurora-background";
-import { HoverBorderGradient } from "../components/ui/hover-border-gradient";
-
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Navbar from "@/components/ui/Navbar";
 import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
+import { motion } from "framer-motion";
+import { AuroraBackground } from "../components/ui/aurora-background";
 import dynamic from "next/dynamic";
 import EventTicketing from "./components/EventTicketing";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
-    if (!sdkHasLoaded) return;
+    console.log("SDK Loaded:", sdkHasLoaded);
+    console.log("User State:", user);
+
+    if (!sdkHasLoaded) {
+      console.log("SDK not yet loaded, skipping sign-in...");
+      return;
+    }
+
     const signIn = async () => {
-      if (!user) {
-        await telegramSignIn({ forceCreateUser: true });
+      try {
+        if (!user) {
+          console.log("Attempting Telegram sign-in...");
+          await telegramSignIn({ forceCreateUser: true });
+          console.log("Telegram sign-in successful.");
+        }
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+        console.log("Finished sign-in process. Loading state:", isLoading);
       }
-      setIsLoading(false);
     };
-    console.log("user", user);
+
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
   useEffect(() => {
     if (smartAccount) {
-      console.log("My Biconomy smart account", smartAccount);
+      console.log("Smart account initialized:", smartAccount);
+    } else {
+      console.warn("Smart account not initialized yet.");
     }
   }, [smartAccount]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center ">
-      {/* <div className="text-[#fff] font-Ubuntu bg-[url('/bg.png')] bg-contain bg-no-repeat bg-center    grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8  mx-auto "></div> */}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center">
       <Navbar />
       <div className="flex flex-col items-center justify-center text-center">
         <AuroraBackground>
@@ -82,21 +90,31 @@ export default function Main() {
                 <CardDescription>One Fucking solution.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
-                <div className="mt-6 flex w-full items-center justify-center ">
-                  {isLoading ? <Spinner /> : <DynamicWidget />}
+                <div className="mt-6 flex w-full items-center justify-center">
+                  {isLoading ? (
+                    <>
+                      <Spinner />
+                      <p>Loading Dynamic Widget...</p>
+                    </>
+                  ) : (
+                    <>
+                      <DynamicWidget />
+                      <p>Dynamic Widget Loaded Successfully.</p>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </AuroraBackground>
 
-        <div className="mt-6">
-          {isLoading ? <Spinner /> : <DynamicWidget />}
-        </div>
-        {smartAccount && (
+        {smartAccount ? (
           <div className="mt-8 w-full max-w-4xl">
             <EventTicketing smartAccount={smartAccount} />
+            <p>Smart Account Component Rendered.</p>
           </div>
+        ) : (
+          <p>Waiting for Smart Account Initialization...</p>
         )}
       </div>
     </div>
