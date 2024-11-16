@@ -1,7 +1,9 @@
+// lib/contracts/eventTicket.ts
 import { encodeFunctionData, createPublicClient, http, Address } from "viem";
 import { baseSepolia } from "viem/chains";
 import type { EventInfo, TransactionResult } from "@/app/types/eventTicket";
 import type { BiconomySmartAccountV2 } from "@biconomy/account";
+import { IHybridPaymaster, SponsorUserOperationDto, PaymasterMode } from '@biconomy/paymaster';
 import eventticketingtest2 from "../../contracts/abis/EventTicketingTest2.json";
 
 const CONTRACT_ADDRESS = "0x7133CF0D4597F39FFA0E5Dd19144800FD49EC47B";
@@ -13,7 +15,6 @@ const publicClient = createPublicClient({
 
 class EventTicketContract {
   private static instance: EventTicketContract;
-  
   private constructor() {}
 
   public static getInstance(): EventTicketContract {
@@ -25,14 +26,11 @@ class EventTicketContract {
 
   public async getEventInfo(): Promise<EventInfo> {
     try {
-      if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
-
       const data = await publicClient.readContract({
         address: CONTRACT_ADDRESS as Address,
         abi: eventticketingtest2,
         functionName: 'getEventInfo',
       }) as unknown as EventInfo;
-
       return data;
     } catch (error) {
       console.error('Error fetching event info:', error);
@@ -42,13 +40,9 @@ class EventTicketContract {
 
   public async buyTicket(smartAccount: BiconomySmartAccountV2): Promise<TransactionResult> {
     try {
-      if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
       if (!smartAccount) throw new Error("Smart account not initialized");
 
-      console.log("Starting buyTicket process...");
-      console.log("Smart Account:", await smartAccount.getAccountAddress());
-      console.log("Contract Address:", CONTRACT_ADDRESS);
-
+      // Prepare the transaction
       const data = encodeFunctionData({
         abi: eventticketingtest2,
         functionName: 'buy',
@@ -56,53 +50,43 @@ class EventTicketContract {
 
       const tx = {
         to: CONTRACT_ADDRESS as Address,
-        data: data,
-        value: BigInt("10000000000000000"), // 0.01 ETH in wei
+        data,
+        value: BigInt("10000000000000000"),
       };
-
-      console.log("Transaction data:", tx);
 
       // Build user operation
       const userOp = await smartAccount.buildUserOp([tx]);
-      console.log("Built userOp:", userOp);
 
-      // Get paymaster data for gasless transaction
-      if (!smartAccount.paymaster) {
-        throw new Error("Paymaster not initialized in smart account");
-      }
+      // Get the paymaster
+      const biconomyPaymaster = smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
 
-      const paymasterAndDataResponse = await smartAccount.paymaster.getPaymasterAndData(userOp);
-      console.log("Paymaster response:", paymasterAndDataResponse);
+      // Get paymaster data
+      const paymasterAndDataResponse = await biconomyPaymaster.getPaymasterAndData(userOp, {
+        mode: PaymasterMode.SPONSORED,
+        calculateGasLimits: true,
+        smartAccountInfo: {
+          name: 'BICONOMY',
+          version: '2.0.0'
+        }
+      });
 
       userOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-      // Send the operation
+      // Send transaction
       const userOpResponse = await smartAccount.sendUserOp(userOp);
-      console.log("UserOp Response:", userOpResponse);
-
-      // Wait for transaction
       const transactionDetails = await userOpResponse.wait();
-      console.log("Transaction Details:", transactionDetails);
 
       return {
         success: true,
         userOpHash: userOpResponse.userOpHash,
         transactionHash: transactionDetails.receipt.transactionHash,
       };
-    } catch (error) {
-      console.error('Error buying ticket:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
-      });
 
+    } catch (error) {
+      console.error("Error in buyTicket:", error);
       return {
         success: false,
-        error: error instanceof Error 
-          ? error.message 
-          : typeof error === 'object' && error !== null 
-            ? JSON.stringify(error) 
-            : 'Unknown error occurred',
+        error: error instanceof Error ? error.message : "Transaction failed"
       };
     }
   }

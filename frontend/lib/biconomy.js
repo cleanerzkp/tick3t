@@ -1,35 +1,59 @@
+// lib/biconomy.js
 import { Bundler } from "@biconomy/bundler";
-import { Paymaster, createSmartAccountClient, DEFAULT_ENTRYPOINT_ADDRESS, ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from "@biconomy/account";
-import { sepolia } from "viem/chains";
+import {
+  BiconomyPaymaster,
+  createSmartAccountClient,
+  DEFAULT_ENTRYPOINT_ADDRESS,
+  ECDSAOwnershipValidationModule,
+  DEFAULT_ECDSA_OWNERSHIP_MODULE,
+} from "@biconomy/account";
+import { baseSepolia } from "viem/chains";
 
+// Initialize Bundler
 const bundler = new Bundler({
   bundlerUrl: process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL,
-  chainId: sepolia.id, // Replace this with your desired network
-  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS, // This is a Biconomy constant
+  chainId: baseSepolia.id,
+  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
 });
 
-const paymaster = new Paymaster({
+// Initialize Paymaster with default mode as SPONSORED
+const paymaster = new BiconomyPaymaster({
   paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL,
+  // Always use sponsored mode by default
+  preferredPaymasterMode: 'SPONSORED',
 });
 
 const createValidationModule = async (signer) => {
   return await ECDSAOwnershipValidationModule.create({
-    signer: signer,
-    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE, // This is a Biconomy constant
+    signer,
+    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
   });
 };
 
 export const createSmartAccount = async (walletClient) => {
-  const validationModule = await createValidationModule(walletClient);
-  console.log('creating')
+  try {
+    console.log("Creating validation module...");
+    const validationModule = await createValidationModule(walletClient);
 
-  return await createSmartAccountClient({
-    signer: walletClient,
-    chainId: sepolia.id, // Replace this with your target network
-    bundler: bundler, // Use the `bundler` we initialized above
-    paymaster: paymaster, // Use the `paymaster` we initialized above
-    entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS, // This is a Biconomy constant
-    defaultValidationModule: validationModule, // Use the `validationModule` we initialized above
-    activeValidationModule: validationModule, // Use the `validationModule` we initialized above
-  });
+    console.log("Creating smart account client with sponsored paymaster...");
+    const smartAccount = await createSmartAccountClient({
+      signer: walletClient,
+      chainId: baseSepolia.id,
+      bundler,
+      paymaster, // This paymaster is configured to always use sponsored mode
+      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+      defaultValidationModule: validationModule,
+      activeValidationModule: validationModule,
+      // Force sponsored transactions
+      paymasterConfig: {
+        onlySponsorFirstTransaction: false, // Sponsor all transactions
+        mode: 'SPONSORED',
+      },
+    });
+
+    return smartAccount;
+  } catch (error) {
+    console.error("Error in createSmartAccount:", error);
+    throw error;
+  }
 };

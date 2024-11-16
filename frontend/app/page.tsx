@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import {
   DynamicWidget,
@@ -8,32 +7,22 @@ import {
 } from "../lib/dynamic";
 import Spinner from "./Spinner";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Navbar from "@/components/ui/Navbar";
+import { useBiconomyAccount } from "./hooks/useBiconomyAccount";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "../components/ui/aurora-background";
-import { HoverBorderGradient } from "../components/ui/hover-border-gradient";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Navbar from "@/components/ui/Navbar";
-import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
-import dynamic from 'next/dynamic';
 import EventTicketing from "./components/EventTicketing";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
-
+    
     const signIn = async () => {
       try {
         if (!user) {
@@ -45,13 +34,13 @@ export default function Main() {
         setIsLoading(false);
       }
     };
-
+    
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
   useEffect(() => {
     if (smartAccount) {
-      console.log('My Biconomy smart account', smartAccount);
+      console.log('Smart account ready:', smartAccount);
     }
   }, [smartAccount]);
 
@@ -91,7 +80,7 @@ export default function Main() {
             </Card>
           </motion.div>
         </AuroraBackground>
-
+        
         {smartAccount && (
           <div className="mt-8 w-full max-w-4xl">
             <EventTicketing smartAccount={smartAccount} />
