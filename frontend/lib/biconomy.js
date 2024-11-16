@@ -1,84 +1,34 @@
-// lib/biconomy.js
-import { Bundler } from "@biconomy/bundler";
-import { 
-  Paymaster, 
-  createSmartAccountClient, 
-  DEFAULT_ENTRYPOINT_ADDRESS, 
-  ECDSAOwnershipValidationModule, 
-  DEFAULT_ECDSA_OWNERSHIP_MODULE 
-} from "@biconomy/account";
-import { baseSepolia } from "viem/chains";
+const { createNexusClient, createBicoPaymasterClient } = require("@biconomy/sdk");
+const { baseSepolia } = require("viem/chains");
+const { http } = require("viem");
 
-// Initialize bundler with logging
-export const initializeBundler = () => {
-  const bundler = new Bundler({
-    bundlerUrl: process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL,
-    chainId: baseSepolia.id,
-    entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-  });
-
-  console.log("Bundler initialized with:", bundler);
-  return bundler;
-};
-
-// Initialize paymaster with logging
-export const initializePaymaster = () => {
-  const paymaster = new Paymaster({
-    paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL,
-  });
-
-  console.log("Paymaster initialized with:", paymaster);
-  return paymaster;
-};
-
-// Create validation module with logging
-export const createValidationModule = async (signer) => {
-  try {
-    const validationModule = await ECDSAOwnershipValidationModule.create({
-      signer: signer,
-      moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
-    });
-    console.log("Validation Module created:", validationModule);
-    return validationModule;
-  } catch (error) {
-    console.error("Error creating Validation Module:", error);
-    throw error;
-  }
-};
-
-// Create smart account with detailed logging
 export const createSmartAccount = async (walletClient) => {
   try {
-    const validationModule = await createValidationModule(walletClient);
-    console.log('Creating smart account...');
-    
-    const bundler = initializeBundler();
-    const paymaster = initializePaymaster();
+    console.log('Creating Nexus client with wallet:', walletClient);
+    if (!process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL || !process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL) {
+      throw new Error("Missing bundler or paymaster URL in environment variables");
+    }
 
-    const nexusClient = await createSmartAccountClient({
+    const nexusClient = await createNexusClient({
       signer: walletClient,
-      chainId: baseSepolia.id,
-      bundler: bundler,
-      paymaster: paymaster,
-      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-      defaultValidationModule: validationModule,
-      activeValidationModule: validationModule,
+      chain: baseSepolia,
+      transport: http(),
+      bundlerTransport: http(process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL),
+      paymaster: createBicoPaymasterClient({
+        paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL
+      })
     });
 
-    console.log('NexusClient initialized:', nexusClient);
+    // Validate the client
+    if (!nexusClient.account?.address) {
+      throw new Error("Invalid Nexus client: No account address");
+    }
 
-    // Log entire NexusClient structure
-    console.log("NexusClient structure:", {
-      factoryAddress: nexusClient.factoryAddress,
-      deploymentState: nexusClient.deploymentState,
-      accountAddress: nexusClient.accountAddress,
-      accountInitCode: nexusClient.accountInitCode,
-      methods: Object.keys(nexusClient),
-    });
-
+    console.log('Smart Account Address:', nexusClient.account.address);
+    console.log('Nexus client created:', nexusClient);
     return nexusClient;
   } catch (error) {
-    console.error("Error in createSmartAccount:", error);
+    console.error("Error creating Nexus client:", error);
     throw error;
   }
 };

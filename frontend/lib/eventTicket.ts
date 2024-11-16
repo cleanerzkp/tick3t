@@ -1,8 +1,8 @@
-import { encodeFunctionData, Address } from "viem";
+import { encodeFunctionData, Address, parseEther } from "viem";
 import { baseSepolia } from "viem/chains";
 import { usePublicClient } from "wagmi";
 import { EventTicketingTestAbi } from "../../contracts/abis/EventTicketingTest2";
-import { NexusClient } from "@biconomy/sdk";
+import type { NexusClient } from "@biconomy/sdk";
 
 export interface EventInfo {
   name: string;
@@ -31,16 +31,15 @@ export function useEventTicketContract(nexusClient: NexusClient | null) {
 
   const getEventInfo = async (): Promise<EventInfo> => {
     try {
-      if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
       if (!publicClient) throw new Error("Public client not configured");
-
+      
       const data = await publicClient.readContract({
         address: CONTRACT_ADDRESS,
         abi: EventTicketingTestAbi.abi,
         functionName: "getEventInfo",
-      }) as unknown as EventInfo;
-
-      return data;
+      });
+      
+      return data as unknown as EventInfo;
     } catch (error) {
       console.error("Error fetching event info:", error);
       throw error;
@@ -51,50 +50,49 @@ export function useEventTicketContract(nexusClient: NexusClient | null) {
     if (!nexusClient) {
       return {
         success: false,
-        error: "Smart account not initialized",
+        error: "Nexus client not initialized",
       };
     }
 
     try {
-      // Encode the function call
+      // Encode the function call data
       const data = encodeFunctionData({
         abi: EventTicketingTestAbi.abi,
         functionName: "buy",
+        args: [],
       });
 
-      // Create transaction exactly as Nexus expects it
-      const userOpHash = await nexusClient.sendTransaction({
+      // Create the call exactly like in the Nexus SDK example
+      const hash = await nexusClient.sendTransaction({
         calls: [{
           to: CONTRACT_ADDRESS,
           data,
-          value: BigInt("10000000000000000"), // 0.01 ETH
+          value: parseEther("0.01"), // 0.01 ETH - matches your original value
         }]
       });
+      console.log("Transaction hash:", hash);
 
-      console.log("UserOp Hash:", userOpHash);
-
-      // Wait for receipt
-      const receipt = await nexusClient.waitForUserOperationReceipt({ 
-        hash: userOpHash 
+      // Wait for receipt exactly like in the Nexus SDK example
+      const receipt = await nexusClient.waitForTransactionReceipt({
+        hash
       });
-
-      console.log("Receipt:", receipt);
+      console.log("Transaction receipt:", receipt);
 
       return {
         success: true,
-        transactionHash: receipt?.receipt?.transactionHash || undefined,
-        userOpHash
+        transactionHash: receipt.transactionHash,
+        userOpHash: hash,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error buying ticket:", {
         error,
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
+        message: error.message || "Unknown error",
+        stack: error.stack || undefined,
       });
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error: error.message || "Unknown error occurred",
       };
     }
   };
