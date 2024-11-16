@@ -1,0 +1,206 @@
+{
+    "abi": [
+      {
+        "inputs": [],
+        "name": "FailedInnerCall",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "blockNo",
+            "type": "uint256"
+          }
+        ],
+        "name": "setBlock",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockNo",
+            "type": "uint256"
+          }
+        ],
+        "name": "setChain",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "email",
+                "type": "string"
+              },
+              {
+                "internalType": "string[]",
+                "name": "dnsRecords",
+                "type": "string[]"
+              }
+            ],
+            "internalType": "struct UnverifiedEmail",
+            "name": "unverifiedEmail",
+            "type": "tuple"
+          }
+        ],
+        "name": "main",
+        "outputs": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "verifierSelector",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "bytes32[8]",
+                    "name": "seal",
+                    "type": "bytes32[8]"
+                  },
+                  {
+                    "internalType": "enum ProofMode",
+                    "name": "mode",
+                    "type": "uint8"
+                  }
+                ],
+                "internalType": "struct Seal",
+                "name": "seal",
+                "type": "tuple"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "callGuestId",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "length",
+                "type": "uint256"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "proverContractAddress",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes4",
+                    "name": "functionSelector",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "settleBlockNumber",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "settleBlockHash",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct CallAssumptions",
+                "name": "callAssumptions",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct Proof",
+            "name": "",
+            "type": "tuple"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "proof",
+        "outputs": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "bytes4",
+                    "name": "verifierSelector",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "bytes32[8]",
+                    "name": "seal",
+                    "type": "bytes32[8]"
+                  },
+                  {
+                    "internalType": "enum ProofMode",
+                    "name": "mode",
+                    "type": "uint8"
+                  }
+                ],
+                "internalType": "struct Seal",
+                "name": "seal",
+                "type": "tuple"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "callGuestId",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "length",
+                "type": "uint256"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "proverContractAddress",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bytes4",
+                    "name": "functionSelector",
+                    "type": "bytes4"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "settleBlockNumber",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes32",
+                    "name": "settleBlockHash",
+                    "type": "bytes32"
+                  }
+                ],
+                "internalType": "struct CallAssumptions",
+                "name": "callAssumptions",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct Proof",
+            "name": "",
+            "type": "tuple"
+          }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+      }
+    ]
+  }

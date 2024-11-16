@@ -1,1 +1,5 @@
 @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/
+vlayer-0.1.0/=lib/vlayer-0.1.0-nightly-20241115-70dfc11/src/
+@openzeppelin-contracts-5.0.1=lib/openzeppelin-contracts/contracts/
+risc0-ethereum-1.0.0/=lib/risc0-ethereum-1.0.0/

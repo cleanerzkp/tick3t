@@ -1,12 +1,55 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.13;
 
+// OpenZeppelin Contracts
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+// Foundry
 import {console} from "forge-std/console.sol";
 
-contract EventTicketing is ERC721 {
+// VLayer Contracts
+import {Proof} from "vlayer-0.1.0/Proof.sol";
+import {Prover} from "vlayer-0.1.0/Prover.sol";
+import {Verifier} from "vlayer-0.1.0/Verifier.sol";
+import {RegexLib} from "vlayer-0.1.0/Regex.sol";
+import {VerifiedEmail, UnverifiedEmail, EmailProofLib} from "vlayer-0.1.0/EmailProof.sol";
+
+// Local Utilities
+import {AddressParser} from "./utils/AddressParser.sol";
+
+
+contract EmailProver is Prover {
+    using Strings for string;
+    using RegexLib for string;
+    using AddressParser for string;
+    using EmailProofLib for UnverifiedEmail;
+
+    string public emailRegex = "";
+
+    constructor(string memory _emailRegex){
+        emailRegex = _emailRegex; 
+    }
+
+    function main(
+        UnverifiedEmail calldata unverifiedEmail
+    ) public view returns (Proof memory) {
+        VerifiedEmail memory email = unverifiedEmail.verify();
+
+        // string[] memory captures = email.subject.capture("Event Invitation$");
+        // require(captures.length == 2, "subject must match the expected pattern");
+        // require(bytes(captures[1]).length > 0, "email header must contain a valid Ethereum address");
+        require(
+            email.from.matches(emailRegex), // sender umons.ac.be, receiver gmail.com
+            "from must be a University address"
+        );
+
+        return (proof());
+    }
+}
+
+
+contract EventTicketing is ERC721, Verifier {
     using Strings for uint256;
     
     struct EventInfo {
@@ -29,6 +72,9 @@ contract EventTicketing is ERC721 {
 
     event TicketMinted(address to, uint256 tokenId, uint256 ticketNumber);
 
+    EmailProver emailProver;
+    string public emailRegex;
+
     constructor(
         string memory _name,
         string memory _url,
@@ -38,7 +84,8 @@ contract EventTicketing is ERC721 {
         uint256 _n_tickets,
         uint256 _price,
         address _owner,
-        string memory __baseURI
+        string memory __baseURI,
+        string memory _email_regex //"^.*@umons.ac.be$"
     ) ERC721("Event Ticket", "TCKT") {
         require(_time > block.timestamp, "Event time must be in future");
         eventInfo = EventInfo({
@@ -53,16 +100,23 @@ contract EventTicketing is ERC721 {
         });
         owner = _owner;
         _baseTokenURI = __baseURI;
+        emailRegex = _email_regex;
+        emailProver = new EmailProver(_email_regex);
     }
+
+    function verifyEmail(Proof calldata) public view onlyVerified(address(emailProver), EmailProver.main.selector) {}
 
     function getEventInfo() public view returns (EventInfo memory) {
         return eventInfo;
     }
 
-    function buy() public payable {
+    function buy(Proof calldata emailProof) public payable {
         require(block.timestamp < eventInfo.time, "Event has already passed");
         require(eventInfo.n_tickets_sold < eventInfo.n_tickets, "Event is sold out");
         require(!hasTicket(msg.sender), "Address already has a ticket");
+        if (isNonEmptyString(emailRegex)){
+            verifyEmail(emailProof);
+        }
 
         // Check payment only if price is greater than 0
         if(eventInfo.price > 0) {
@@ -134,6 +188,10 @@ contract EventTicketing is ERC721 {
         if (tokenId>_tokenIds) return false;
         if (block.timestamp >= eventInfo.time) return false;
         return true;
+    }
+
+    function isNonEmptyString(string memory str) public pure returns (bool) {
+        return bytes(str).length > 0;
     }
 
 }
