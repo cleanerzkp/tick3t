@@ -5,6 +5,7 @@
   "scripts": {
     "lint:solidity": "solhint '../src/**/*.sol'",
     "prove:testnet": "VLAYER_ENV=testnet bun run prove.ts",
+    "prove:testnet-without-deploy": "VLAYER_ENV=testnet bun run proveWithoutDeploy.ts",
     "prove:dev": "VLAYER_ENV=dev bun run prove.ts"
   },
   "dependencies": {
