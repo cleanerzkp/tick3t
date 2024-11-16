@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import type { EventInfo } from '../types/eventTicket';
-import type { NexusClient } from '@biconomy/sdk';
 import { formatEther } from 'viem';
+import type { NexusClient } from '@biconomy/sdk';
 import { useEventTicketContract } from '@/lib/eventTicket';
+import type { EventInfo } from '@/lib/eventTicket';
 
 interface EventTicketingProps {
   smartAccount: NexusClient | null;
@@ -51,7 +51,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
     setUserOpHash(null);
 
     try {
-      console.log("Starting ticket purchase with smart account...");
+      console.log("Starting gasless ticket purchase...");
       const result = await buyTicket();
 
       if (result.success) {
