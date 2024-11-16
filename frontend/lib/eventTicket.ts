@@ -1,7 +1,7 @@
 import { encodeFunctionData, createPublicClient, http, Address } from "viem";
 import { baseSepolia } from "viem/chains";
 import type { EventInfo, TransactionResult } from "@/app/types/eventTicket";
-import { createNexusClient, createBicoPaymasterClient } from "@biconomy/sdk";
+import type { BiconomySmartAccountV2 } from "@biconomy/account";
 import eventticketingtest2 from "../../contracts/abis/EventTicketingTest2.json";
 
 const CONTRACT_ADDRESS = "0x7133CF0D4597F39FFA0E5Dd19144800FD49EC47B";
@@ -13,6 +13,7 @@ const publicClient = createPublicClient({
 
 class EventTicketContract {
   private static instance: EventTicketContract;
+  
   private constructor() {}
 
   public static getInstance(): EventTicketContract {
@@ -39,76 +40,55 @@ class EventTicketContract {
     }
   }
 
-  public async buyTicket(walletClient: any): Promise<TransactionResult> {
+  public async buyTicket(smartAccount: BiconomySmartAccountV2): Promise<TransactionResult> {
     try {
       if (!CONTRACT_ADDRESS) throw new Error("Contract address not configured");
-      if (!walletClient) throw new Error("Wallet client not initialized");
+      if (!smartAccount) throw new Error("Smart account not initialized");
 
-      console.log("Starting buyTicket process with wallet client:", walletClient);
+      console.log("Starting buyTicket process...");
+      console.log("Smart Account:", await smartAccount.getAccountAddress());
+      console.log("Contract Address:", CONTRACT_ADDRESS);
 
-      // Create Nexus client
-      const nexusClient = await createNexusClient({
-        signer: walletClient,
-        chain: baseSepolia,
-        transport: http(),
-        bundlerTransport: http(process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL || ""),
-        paymaster: createBicoPaymasterClient({
-          paymasterUrl: process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL || ""
-        })
+      const data = encodeFunctionData({
+        abi: eventticketingtest2,
+        functionName: 'buy',
       });
 
-      console.log("Nexus client created");
+      const tx = {
+        to: CONTRACT_ADDRESS as Address,
+        data: data,
+        value: BigInt("10000000000000000"), // 0.01 ETH in wei
+      };
 
-      // Estimate gas first
-      const gasEstimates = await nexusClient.estimateUserOperationGas({
-        calls: [{
-          to: CONTRACT_ADDRESS,
-          data: encodeFunctionData({
-            abi: eventticketingtest2,
-            functionName: 'buy',
-          }),
-          value: BigInt("10000000000000000"), // 0.01 ETH in wei
-        }]
-      });
+      console.log("Transaction data:", tx);
 
-      console.log("Gas estimates:", gasEstimates);
+      // Build user operation
+      const userOp = await smartAccount.buildUserOp([tx]);
+      console.log("Built userOp:", userOp);
 
-      // Send the transaction
-      const hash = await nexusClient.sendTransaction({
-        calls: [{
-          to: CONTRACT_ADDRESS,
-          data: encodeFunctionData({
-            abi: eventticketingtest2,
-            functionName: 'buy',
-          }),
-          value: BigInt("10000000000000000"), // 0.01 ETH in wei
-        }]
-      });
+      // Get paymaster data for gasless transaction
+      if (!smartAccount.paymaster) {
+        throw new Error("Paymaster not initialized in smart account");
+      }
 
-      console.log("Transaction hash:", hash);
+      const paymasterAndDataResponse = await smartAccount.paymaster.getPaymasterAndData(userOp);
+      console.log("Paymaster response:", paymasterAndDataResponse);
 
-      // Wait for the transaction receipt
-      const receipt = await nexusClient.waitForUserOperationReceipt({ 
-        hash,
-        timeout: 30000, // 30 seconds
-        pollingInterval: 2000, // Poll every 2 seconds
-      });
+      userOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-      console.log("Transaction receipt:", receipt);
+      // Send the operation
+      const userOpResponse = await smartAccount.sendUserOp(userOp);
+      console.log("UserOp Response:", userOpResponse);
 
-      // Get user operation details
-      const userOpDetails = await nexusClient.getUserOperation({
-        hash: receipt.userOpHash
-      });
-
-      console.log("User operation details:", userOpDetails);
+      // Wait for transaction
+      const transactionDetails = await userOpResponse.wait();
+      console.log("Transaction Details:", transactionDetails);
 
       return {
         success: true,
-        transactionHash: receipt.receipt.transactionHash,
-        userOpHash: receipt.userOpHash
+        userOpHash: userOpResponse.userOpHash,
+        transactionHash: transactionDetails.receipt.transactionHash,
       };
-
     } catch (error) {
       console.error('Error buying ticket:', {
         error,
@@ -120,8 +100,8 @@ class EventTicketContract {
         success: false,
         error: error instanceof Error 
           ? error.message 
-          : typeof error === 'object' && error !== null
-            ? JSON.stringify(error)
+          : typeof error === 'object' && error !== null 
+            ? JSON.stringify(error) 
             : 'Unknown error occurred',
       };
     }

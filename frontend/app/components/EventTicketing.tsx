@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { eventTicketContract } from '@/lib/eventTicket';
 import type { EventInfo } from '@/app/types/eventTicket';
 import { formatEther } from 'viem';
-import type { WalletClient } from 'viem';
+import type { BiconomySmartAccountV2 } from "@biconomy/account";
 
 interface EventTicketingProps {
-  walletClient: WalletClient;
+  smartAccount: BiconomySmartAccountV2 | null;
 }
 
-export default function EventTicketing({ walletClient }: EventTicketingProps) {
+export default function EventTicketing({ smartAccount }: EventTicketingProps) {
   const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isBuying, setIsBuying] = useState(false);
@@ -38,15 +38,21 @@ export default function EventTicketing({ walletClient }: EventTicketingProps) {
   }, []);
 
   const handleBuyTicket = async () => {
+    if (!smartAccount) {
+      setError("Smart account not initialized");
+      return;
+    }
+
     setIsBuying(true);
     setError(null);
     setTransactionHash(null);
     setUserOpHash(null);
 
     try {
-      console.log("Starting ticket purchase...");
+      console.log("Starting ticket purchase with smart account...");
+      console.log("Smart Account Address:", await smartAccount.getAccountAddress());
 
-      const result = await eventTicketContract.buyTicket(walletClient);
+      const result = await eventTicketContract.buyTicket(smartAccount);
       console.log("Purchase result:", result);
 
       if (result.success) {
@@ -58,6 +64,9 @@ export default function EventTicketing({ walletClient }: EventTicketingProps) {
           const updatedInfo = await eventTicketContract.getEventInfo();
           setEventInfo(updatedInfo);
         }, 5000);
+
+        // Show success message
+        setError(null);
       } else {
         setError(result.error || "Transaction failed. Please try again.");
         console.error("Purchase failed:", result.error);
@@ -81,6 +90,16 @@ export default function EventTicketing({ walletClient }: EventTicketingProps) {
           <div className="w-full h-64 bg-gray-700 rounded-lg mb-4"></div>
           <div className="w-3/4 h-8 bg-gray-700 rounded mb-4"></div>
           <div className="w-1/2 h-6 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!smartAccount) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl">
+        <div className="text-center text-red-500">
+          Please connect your wallet and initialize smart account to continue.
         </div>
       </div>
     );
@@ -129,12 +148,12 @@ export default function EventTicketing({ walletClient }: EventTicketingProps) {
               {isBuying ? (
                 <span className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Processing...
+                  Processing Gasless Transaction...
                 </span>
               ) : eventInfo.n_tickets_sold >= eventInfo.n_tickets ? (
                 'Sold Out'
               ) : (
-                'Buy Ticket'
+                'Buy Ticket (Gasless)'
               )}
             </button>
           </div>
@@ -147,13 +166,14 @@ export default function EventTicketing({ walletClient }: EventTicketingProps) {
 
           {(transactionHash || userOpHash) && (
             <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded-lg mt-4">
+              <div className="font-semibold mb-2">Transaction Successful!</div>
               {transactionHash && (
-                <div>
+                <div className="text-sm">
                   Transaction Hash: {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
                 </div>
               )}
               {userOpHash && (
-                <div className="mt-2">
+                <div className="text-sm mt-2">
                   User Operation Hash: {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
                 </div>
               )}

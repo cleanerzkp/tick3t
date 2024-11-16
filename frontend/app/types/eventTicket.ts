@@ -1,4 +1,5 @@
-import type { Hash } from "viem";
+// app/types/eventTicket.ts
+import type { BiconomySmartAccountV2 } from "@biconomy/account";
 
 export interface EventInfo {
   name: string;
@@ -13,7 +14,10 @@ export interface EventInfo {
 
 export interface TransactionResult {
   success: boolean;
-  transactionHash?: Hash;
   userOpHash?: string;
+  transactionHash?: string;
   error?: string;
 }
+
+// Export BiconomySmartAccount type
+export type BiconomySmartAccount = BiconomySmartAccountV2;

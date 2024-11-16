@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { createSmartAccount } from "../../lib/biconomy.js";
-import { baseSepolia } from "viem/chains";
+import { createSmartAccount } from "../../lib/biconomy";
 
 export function useBiconomyAccount() {
   const { primaryWallet } = useDynamicContext();
   const [smartAccount, setSmartAccount] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const createAndSetSmartAccount = useCallback(async () => {
     if (!primaryWallet) {
@@ -15,44 +13,27 @@ export function useBiconomyAccount() {
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-
     try {
-      const walletClient = await primaryWallet.getWalletClient({
-        chainId: baseSepolia.id,
-      });
-
-      if (walletClient && !smartAccount) {
-        console.log("Creating smart account");
-        console.log("Wallet client:", walletClient);
+      setIsLoading(true);
+      const walletClient = await primaryWallet.getWalletClient();
+      
+      if (walletClient) {
+        console.log("Creating smart account for:", primaryWallet.address);
         const newSmartAccount = await createSmartAccount(walletClient);
         setSmartAccount(newSmartAccount);
       }
     } catch (error) {
-      console.error('Error fetching wallet clients or creating smart account:', {
-        error,
-        message: error instanceof Error ? error.message : 'Unknown error',
-        wallet: primaryWallet?.connector?.name
-      });
-      setError(error);
+      console.error('Error creating smart account:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [primaryWallet, smartAccount]);
-
-  useEffect(() => {
-    createAndSetSmartAccount();
-  }, [createAndSetSmartAccount]);
+  }, [primaryWallet]);
 
   useEffect(() => {
     if (primaryWallet) {
-      console.log("Primary wallet changed:", {
-        name: primaryWallet.connector?.name,
-        address: primaryWallet.address,
-      });
+      createAndSetSmartAccount();
     }
-  }, [primaryWallet]);
+  }, [primaryWallet, createAndSetSmartAccount]);
 
-  return { smartAccount, isLoading, error };
+  return { smartAccount, isLoading };
 }

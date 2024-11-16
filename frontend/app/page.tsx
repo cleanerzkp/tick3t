@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,10 +10,8 @@ import Spinner from "./Spinner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-
 import { AuroraBackground } from "../components/ui/aurora-background";
 import { HoverBorderGradient } from "../components/ui/hover-border-gradient";
-
 import {
   Card,
   CardContent,
@@ -36,12 +33,19 @@ export default function Main() {
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
+
     const signIn = async () => {
-      if (!user) {
-        await telegramSignIn({ forceCreateUser: true });
+      try {
+        if (!user) {
+          await telegramSignIn({ forceCreateUser: true });
+        }
+      } catch (error) {
+        console.error("Telegram sign in error:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
+
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
@@ -52,11 +56,10 @@ export default function Main() {
   }, [smartAccount]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center ">
-      {/* <div className="text-[#fff] font-Ubuntu bg-[url('/bg.png')] bg-contain bg-no-repeat bg-center    grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8  mx-auto "></div> */}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center">
       <Navbar />
       <div className="flex flex-col items-center justify-center text-center">
-       <AuroraBackground>
+        <AuroraBackground>
           <motion.div
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -81,7 +84,7 @@ export default function Main() {
                 <CardDescription>One Fucking solution.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
-                <div className="mt-6 flex w-full items-center justify-center ">
+                <div className="mt-6 flex w-full items-center justify-center">
                   {isLoading ? <Spinner /> : <DynamicWidget />}
                 </div>
               </CardContent>
@@ -89,9 +92,6 @@ export default function Main() {
           </motion.div>
         </AuroraBackground>
 
-        <div className="mt-6">
-          {isLoading ? <Spinner /> : <DynamicWidget />}
-        </div>
         {smartAccount && (
           <div className="mt-8 w-full max-w-4xl">
             <EventTicketing smartAccount={smartAccount} />
