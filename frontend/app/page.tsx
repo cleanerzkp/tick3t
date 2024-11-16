@@ -22,6 +22,7 @@ import dynamic from "next/dynamic";
 import EventTicketing from "./components/EventTicketing";
 import { useEventTicketContract } from "@/lib/eventTicket";
 import { useRouter } from "next/navigation";
+import { MiniKit } from "@worldcoin/minikit-js";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
@@ -71,6 +72,7 @@ export default function Main() {
       //navigate to home if already logged in
       navigate.push("/Home");
     }
+    console.log("MiniKit", MiniKit.isInstalled());
   }, [user]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center">
