@@ -50,7 +50,8 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
 
     try {
       console.log("Starting ticket purchase with smart account...");
-      console.log("Smart Account Address:", await smartAccount.getAccountAddress());
+      const address = await smartAccount.getAccountAddress();
+      console.log("Smart Account Address:", address);
 
       const result = await eventTicketContract.buyTicket(smartAccount);
       console.log("Purchase result:", result);
@@ -59,13 +60,16 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
         setTransactionHash(result.transactionHash || null);
         setUserOpHash(result.userOpHash || null);
         
-        // Wait a bit before fetching updated info to allow for blockchain confirmation
+        // Wait for blockchain confirmation before updating UI
         setTimeout(async () => {
-          const updatedInfo = await eventTicketContract.getEventInfo();
-          setEventInfo(updatedInfo);
+          try {
+            const updatedInfo = await eventTicketContract.getEventInfo();
+            setEventInfo(updatedInfo);
+          } catch (err) {
+            console.error("Error updating event info:", err);
+          }
         }, 5000);
 
-        // Show success message
         setError(null);
       } else {
         setError(result.error || "Transaction failed. Please try again.");

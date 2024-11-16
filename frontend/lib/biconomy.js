@@ -1,10 +1,12 @@
 import { Bundler } from "@biconomy/bundler";
-import { Paymaster, createSmartAccountClient, DEFAULT_ENTRYPOINT_ADDRESS, ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from "@biconomy/account";
+import { Paymaster, createSmartAccountClient, DEFAULT_ENTRYPOINT_ADDRESS, ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE, SupportedSigner } from "@biconomy/account";
 import { baseSepolia } from "viem/chains";
+import {ChainId} from '@biconomy/core-types'
+import { WalletClient } from "@/app/types/biconomy";
 
 const bundler = new Bundler({
   bundlerUrl: process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL,
-  chainId: baseSepolia.id, // Replace this with your desired network
+  chainId: 84532, // Replace this with your desired network
   entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS, // This is a Biconomy constant
 });
 
