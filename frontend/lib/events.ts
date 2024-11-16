@@ -1,5 +1,3 @@
-// lib/eventTicket.ts
-
 import { 
     Address, 
     Hash, 
