@@ -69,23 +69,21 @@ contract EventTicketingTest is Test {
         assertTrue(isValid);
     }
 
-    function testBuyMultipleTickets() public {
-        vm.startPrank(user1);
-        
-        ticketing.buy{value: PRICE}();
-        ticketing.buy{value: PRICE}();
-        ticketing.buy{value: PRICE}();
-
-        vm.stopPrank();
-
-        assertEq(ticketing.balanceOf(user1), 3);
-        
-        uint256[] memory tickets = ticketing.getTicketsByOwner(user1);
-        assertEq(tickets.length, 3);
-        assertEq(tickets[0], 1);
-        assertEq(tickets[1], 2);
-        assertEq(tickets[2], 3);
-    }
+    function testCannotBuyTwiceFromSameAddress() public {
+            vm.startPrank(user1);
+            
+            // First purchase should succeed
+            ticketing.buy{value: PRICE}();
+            
+            // Second purchase should fail
+            vm.expectRevert("Address already has a ticket");
+            ticketing.buy{value: PRICE}();
+            
+            vm.stopPrank();
+            
+            // Verify user1 has exactly one ticket
+            assertEq(ticketing.balanceOf(user1), 1, "User should have exactly one ticket");
+        }
 
     function testFreeTickets() public {
         // Create new event with free tickets
@@ -166,27 +164,6 @@ contract EventTicketingTest is Test {
         );
 
         freeEvent.withdraw();
-    }
-
-    function testGetTicketsByOwner() public {
-        // User1 buys 2 tickets
-        vm.startPrank(user1);
-        ticketing.buy{value: PRICE}();
-        ticketing.buy{value: PRICE}();
-        vm.stopPrank();
-
-        // User2 buys 1 ticket
-        vm.prank(user2);
-        ticketing.buy{value: PRICE}();
-
-        uint256[] memory user1Tickets = ticketing.getTicketsByOwner(user1);
-        uint256[] memory user2Tickets = ticketing.getTicketsByOwner(user2);
-
-        assertEq(user1Tickets.length, 2);
-        assertEq(user2Tickets.length, 1);
-        assertEq(user1Tickets[0], 1);
-        assertEq(user1Tickets[1], 2);
-        assertEq(user2Tickets[0], 3);
     }
 
     function testVerifyTicket() public {

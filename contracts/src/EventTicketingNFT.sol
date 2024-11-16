@@ -62,7 +62,8 @@ contract EventTicketing is ERC721 {
     function buy() public payable {
         require(block.timestamp < eventInfo.time, "Event has already passed");
         require(eventInfo.n_tickets_sold < eventInfo.n_tickets, "Event is sold out");
-        
+        require(!hasTicket(msg.sender), "Address already has a ticket");
+
         // Check payment only if price is greater than 0
         if(eventInfo.price > 0) {
             require(msg.value >= eventInfo.price, "Insufficient payment");
@@ -127,24 +128,6 @@ contract EventTicketing is ERC721 {
 
     function hasTicket(address attendee) public view returns (bool) {
         return balanceOf(attendee) > 0;
-    }
-
-    function getTicketsByOwner(address attendee) 
-        public 
-        view 
-        returns (uint256[] memory) 
-    {
-        uint256 ticketCount = balanceOf(attendee);
-        uint256[] memory result = new uint256[](ticketCount);
-        uint256 counter = 0;
-        
-        for (uint256 i = 1; i <= _tokenIds; i++) {
-            if (ownerOf(i) == attendee) {
-                result[counter] = i;
-                counter++;
-            }
-        }
-        return result;
     }
 
     function verifyTicket(uint256 tokenId) public view returns (bool) {
