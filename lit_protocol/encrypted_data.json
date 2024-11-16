@@ -1,0 +1,21 @@
+{
+  "ciphertext": "hLJx85uEOyaCvQPu4Y3cq69iYbWejTGn3cRKlJg2r32qfbscx37NFjYRxKG8swCvXUagpj/hX/M7j0Iq88UCxdQF7yocbJExPh921SN6h3xE2p7oeC+TyCaM2MTozW6W5CRBlMrySDgg5nagz2brsq0Hzgpl0kkog/Dq6NiIdPWWop0vAvZ6RRcSqklDLkbipAN2dfMC",
+  "dataToEncryptHash": "405a21cc05adc5322c17a596e6e5caefe53e6e7594ac4e4f3c1dc5c1157ce737",
+  "accessControlConditions": [
+    {
+      "contractAddress": "",
+      "standardContractType": "",
+      "chain": "baseSepolia",
+      "method": "eth_getBalance",
+      "parameters": [
+        ":userAddress",
+        "latest"
+      ],
+      "returnValueTest": {
+        "comparator": ">=",
+        "value": "1000000000000"
+      }
+    }
+  ],
+  "chain": "baseSepolia"
+}

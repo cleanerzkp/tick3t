@@ -1,8 +1,9 @@
+node_modules
+.env
 **/out
 **/cache
-**/DS_Store
+**/.DS_Store
 **/out
 **/cache
 contracts/out
 contracts/cache
-**/.env
