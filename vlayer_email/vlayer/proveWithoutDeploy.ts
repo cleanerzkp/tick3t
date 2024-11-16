@@ -41,13 +41,26 @@ const result = await vlayer.waitForProvingResult(hash);
 console.log("Proof:", result[0]);
 console.log("Verifying...");
 
+// Save all necessary data
+// fs.writeFileSync('./proof_data.json', JSON.stringify({
+//   hash: hash,
+//   result: result,
+//   verifierAddress: "0xa827c4f310f76fb31b2864e3de2ad20f713cd307",
+// }, null, 2));
+// console.log("Proof data saved to proof_data.json");
+
+console.log("Verifying...");
+
+// const proofData = JSON.parse(fs.readFileSync('./proof_data.json', 'utf8'));
+    
+
 await new Promise((resolve) => setTimeout(resolve, 10000));
 
 const txHash = await ethClient.writeContract({
   address: "0xa827c4f310f76fb31b2864e3de2ad20f713cd307",
   abi: verifierSpec.abi,
   functionName: "verify",
-  args: result,
+  args: result, //proofData.result,
   chain,
   account: account,
 });
