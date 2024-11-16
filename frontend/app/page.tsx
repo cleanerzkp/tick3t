@@ -7,11 +7,18 @@ import {
 } from "../lib/dynamic";
 import Spinner from "./Spinner";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Navbar from "@/components/ui/Navbar";
 import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "../components/ui/aurora-background";
+import dynamic from "next/dynamic";
 import EventTicketing from "./components/EventTicketing";
 import { useEventTicketContract } from "@/lib/eventTicket";
 
@@ -75,12 +82,12 @@ export default function Main() {
           >
             <Card
               className={cn(
-                "w-[380px] bg-transparent backdrop-blur-xl shadow-xl text-[#ffffff] border-[#ffffff90] border-[1px]"
+                "w-[380px] bg-transparent   text-[#ffffff] border-[#ffffff90] border-none"
               )}
             >
               <CardHeader>
                 <CardTitle>
-                  <div className="text-3xl font-sans md:text-7xl font-bold text-white text-center">
+                  <div className="text-3xl font-sans md:text-7xl font-bold text-[#ffffff99] text-center">
                     Welcome to Tick3t
                   </div>
                 </CardTitle>

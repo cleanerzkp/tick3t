@@ -5,3 +5,4 @@
 **/cache
 contracts/out
 contracts/cache
+**/.env
