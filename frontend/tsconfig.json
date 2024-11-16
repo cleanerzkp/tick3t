@@ -22,15 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "lib/biconomy.js",
-    "app/types/biconomy.js",
-    "app/hooks/useBiconomyAccount.ts",
-    "components/ui/time-picker-utils.tsz"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/biconomy.js", "app/types/biconomy.js", "app/hooks/useBiconomyAccount.ts"],
   "exclude": ["node_modules"]
 }

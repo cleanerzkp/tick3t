@@ -1,5 +1,5 @@
-// app/layout.tsx
 "use client";
+
 import "./globals.css";
 import { Inter } from "next/font/google";
 import {
@@ -11,19 +11,16 @@ import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import { createConfig, WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "viem";
-import { baseSepolia, mainnet, sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 
 const inter = Inter({ subsets: ["latin"] });
 const dynamicEnvId = process.env.NEXT_PUBLIC_DYNAMIC_ENV_ID;
 
-// Configure all required chains
 const config = createConfig({
-  chains: [baseSepolia, mainnet, sepolia], // Add all chains that appear in the errors
+  chains: [baseSepolia],
   multiInjectedProviderDiscovery: false,
   transports: {
     [baseSepolia.id]: http(),
-    [mainnet.id]: http(),
-    [sepolia.id]: http()
   },
 });
 

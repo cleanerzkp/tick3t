@@ -90,7 +90,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                         <p className="text-[14px]    text-[hsla(0,0%,100%,.5)]">
                           By {eventItem.organiser}
                         </p>
-                        <p className="text-[14px] flex flex-row gap-1 items-center   text-[hsla(0,0%,100%,.5)]">
+                        <div className="text-[14px] flex flex-row gap-1 items-center   text-[hsla(0,0%,100%,.5)]">
                           <div className="w-4 h-4">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -98,11 +98,11 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                             >
                               <g
                                 fill="none"
-                                fill-rule="evenodd"
+                                fillRule="evenodd"
                                 stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.5"
                               >
                                 <path d="M2 6.854C2 11.02 7.04 15 8 15s6-3.98 6-8.146C14 3.621 11.314 1 8 1S2 3.62 2 6.854"></path>
                                 <path d="M9.5 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"></path>
@@ -110,7 +110,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                             </svg>
                           </div>{" "}
                           {eventItem.location}
-                        </p>
+                        </div>
                         <p className="text-[14px] w-fit   text-white bg-[#3cbd2c]  px-[4px] rounded-[4px]">
                           {eventItem.status}
                         </p>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { eventTicketContract } from '@/lib/eventTicket';
-import type { EventInfo } from '@/app/types/eventTicket';
 import { formatEther } from 'viem';
-import type { BiconomySmartAccountV2 } from "@biconomy/account";
+import type { NexusClient } from '@biconomy/sdk';
+import { useEventTicketContract } from '@/lib/eventTicket';
+import type { EventInfo } from '@/lib/eventTicket';
 
 interface EventTicketingProps {
-  smartAccount: BiconomySmartAccountV2 | null;
+  smartAccount: NexusClient | null;
 }
 
 export default function EventTicketing({ smartAccount }: EventTicketingProps) {
@@ -18,10 +18,12 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const [userOpHash, setUserOpHash] = useState<string | null>(null);
 
+  const { getEventInfo, buyTicket } = useEventTicketContract(smartAccount);
+
   useEffect(() => {
     const fetchEventInfo = async () => {
       try {
-        const info = await eventTicketContract.getEventInfo();
+        const info = await getEventInfo();
         setEventInfo(info);
         setError(null);
       } catch (err) {
@@ -35,7 +37,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
     fetchEventInfo();
     const interval = setInterval(fetchEventInfo, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [getEventInfo]);
 
   const handleBuyTicket = async () => {
     if (!smartAccount) {
@@ -49,23 +51,22 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
     setUserOpHash(null);
 
     try {
-      console.log("Starting ticket purchase with smart account...");
-      console.log("Smart Account Address:", await smartAccount.getAccountAddress());
-
-      const result = await eventTicketContract.buyTicket(smartAccount);
-      console.log("Purchase result:", result);
+      console.log("Starting gasless ticket purchase...");
+      const result = await buyTicket();
 
       if (result.success) {
         setTransactionHash(result.transactionHash || null);
         setUserOpHash(result.userOpHash || null);
         
-        // Wait a bit before fetching updated info to allow for blockchain confirmation
         setTimeout(async () => {
-          const updatedInfo = await eventTicketContract.getEventInfo();
-          setEventInfo(updatedInfo);
+          try {
+            const updatedInfo = await getEventInfo();
+            setEventInfo(updatedInfo);
+          } catch (err) {
+            console.error("Error updating event info:", err);
+          }
         }, 5000);
 
-        // Show success message
         setError(null);
       } else {
         setError(result.error || "Transaction failed. Please try again.");
@@ -120,7 +121,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
             <p className="text-gray-300 mb-4">
               {new Date(Number(eventInfo.time) * 1000).toLocaleString()}
             </p>
-            
+  
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-gray-700 p-4 rounded-lg">
                 <p className="text-sm text-gray-300">Available Tickets</p>
@@ -135,7 +136,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
                 </p>
               </div>
             </div>
-
+  
             <button
               onClick={handleBuyTicket}
               disabled={isBuying || eventInfo.n_tickets_sold >= eventInfo.n_tickets}
@@ -157,24 +158,40 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
               )}
             </button>
           </div>
-
+  
           {error && (
             <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mt-4">
               {error}
             </div>
           )}
-
+  
           {(transactionHash || userOpHash) && (
             <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded-lg mt-4">
               <div className="font-semibold mb-2">Transaction Successful!</div>
               {transactionHash && (
                 <div className="text-sm">
-                  Transaction Hash: {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
+                  Transaction Hash:{" "}
+                  <a
+                    href={`https://base-sepolia.blockscout.com/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
+                  </a>
                 </div>
               )}
               {userOpHash && (
                 <div className="text-sm mt-2">
-                  User Operation Hash: {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
+                  User Operation Hash:{" "}
+                  <a
+                    href={`https://base-sepolia.blockscout.com/userOp/${userOpHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
+                  </a>
                 </div>
               )}
             </div>

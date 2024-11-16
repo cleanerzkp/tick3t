@@ -1,4 +1,4 @@
-[
+export const EventTicketingTestAbi = {"abi":[
     {
       "type": "constructor",
       "inputs": [],
@@ -50,4 +50,4 @@
       ],
       "stateMutability": "view"
     }
-  ]
+  ]} as const 
