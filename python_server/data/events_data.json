@@ -1,0 +1,50 @@
+{
+    "eventDataByDate": [
+      {
+        "date": "Nov 16",
+        "events": [
+          {
+            "time": "10:00 AM",
+            "title": "ETH Singapore Hackathon Kickoff",
+            "description": "3-day hackathon focusing on Layer 2 scaling solutions and DeFi innovations. Join teams, build projects, and compete for prizes.",
+            "organiser": "ETH Global",
+            "location": "Marina Bay Sands Convention Center",
+            "img": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,quality=75,width=80,height=80/event-covers/sg/hackathon-cover-1",
+            "status": "Going"
+          },
+          {
+            "time": "02:00 PM",
+            "title": "Web3 Security Workshop",
+            "description": "Learn about common smart contract vulnerabilities and best practices for securing your DApps",
+            "organiser": "ConsenSys",
+            "location": "Virtual Event",
+            "img": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,quality=75,width=80,height=80/event-covers/cs/security-workshop",
+            "status": "Interested"
+          }
+        ]
+      },
+      {
+        "date": "Nov 17",
+        "events": [
+          {
+            "time": "09:00 AM",
+            "title": "DeFi Trading Strategies Summit",
+            "description": "Expert panels on MEV, liquidity provision, and advanced trading strategies in DeFi",
+            "organiser": "Uniswap Foundation",
+            "location": "Raffles Hotel, Diamond Ballroom",
+            "img": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,quality=75,width=80,height=80/event-covers/uni/defi-summit",
+            "status": "Going"
+          },
+          {
+            "time": "03:30 PM",
+            "title": "Zero Knowledge Proofs Masterclass",
+            "description": "Technical deep dive into ZK-rollups and privacy-preserving applications",
+            "organiser": "Polygon Labs",
+            "location": "shown Upon Approval",
+            "img": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,quality=75,width=80,height=80/event-covers/pol/zk-class",
+            "status": "Waitlist"
+          }
+        ]
+      }
+    ]
+  }

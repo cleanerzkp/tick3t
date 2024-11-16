@@ -1,0 +1,44 @@
+{
+    "events": [
+      {
+        "index": 0,
+        "name": "ETH Global Paris",
+        "location": "Paris, France",
+        "time": 1718409600,
+        "url": "https://ethglobal.paris",
+        "image": "https://st3.depositphotos.com/2495409/12558/i/450/depositphotos_125585348-stock-photo-ticket-concept-3d-illustration.jpg"
+      },
+      {
+        "index": 1,
+        "name": "DevConnect Istanbul",
+        "location": "Istanbul, Turkey",
+        "time": 1720828800,
+        "url": "https://devconnect.istanbul",
+        "image": "https://st4.depositphotos.com/12982378/22324/i/450/depositphotos_223241392-stock-photo-black-event-tickets-isolated-white.jpg"
+      },
+      {
+        "index": 2,
+        "name": "ETH Singapore",
+        "location": "Marina Bay Sands, Singapore",
+        "time": 1723507200,
+        "url": "https://ethsingapore.co",
+        "image": "https://st4.depositphotos.com/12982378/22324/i/450/depositphotos_223241614-stock-photo-event-tickets-isolated-white-background.jpg"
+      },
+      {
+        "index": 3,
+        "name": "Web3 Summit London",
+        "location": "ExCeL London, UK",
+        "time": 1725926400,
+        "url": "https://web3summit.london",
+        "image": "https://st.depositphotos.com/1000128/2720/i/450/depositphotos_27208019-stock-photo-ticket-stub-isolated-on-white.jpg"
+      },
+      {
+        "index": 4,
+        "name": "DeFi Protocol Summit",
+        "location": "Berlin, Germany",
+        "time": 1728518400,
+        "url": "https://defiprotocol.berlin",
+        "image": "https://st2.depositphotos.com/4218696/6914/i/450/depositphotos_69149313-stock-photo-tickets.jpg"
+      }
+    ]
+  }

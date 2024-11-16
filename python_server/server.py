@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+import json
+from typing import List, Dict
 import uvicorn
 
 app = FastAPI()
@@ -14,43 +16,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Store event info (in a real app, this would come from a database)
-event_info = {
-    "name": "ETH Global Paris",
-    "location": "Paris, France",
-    "time": int(datetime(2024, 7, 15).timestamp()),  # Example date
-    "url": "https://ethglobal.paris",
-    "image": "https://st3.depositphotos.com/2495409/12558/i/450/depositphotos_125585348-stock-photo-ticket-concept-3d-illustration.jpg"  # Replace with your image URL
-}
-
-@app.get("/")
-async def root():
-    return {"status": "running", "service": "NFT Metadata Server"}
-
-@app.get("/metadata/{token_id}")
-async def get_metadata(token_id: int):
+def load_nft_events():
+    """Load NFT events data from JSON file"""
     try:
-        # Validate token_id is a positive integer
+        with open('data/nft_metadata.json', 'r') as f:
+            data = json.load(f)
+            # Create a dictionary with index as key for faster lookup
+            return {str(event['index']): event for event in data['events']}
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="Events data file not found")
+
+def load_crypto_events():
+    """Load crypto events schedule data from JSON file"""
+    try:
+        with open('data/events_data.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="Crypto events schedule file not found")
+
+@app.get("/hello")
+async def hello():
+    return {"status": "running"}
+
+@app.get("/metadata/{event_id}/{token_id}")
+async def get_metadata(event_id: str, token_id: int):
+    try:
+        # Load events data
+        events = load_nft_events()
+        
+        # Check if event exists
+        if event_id not in events:
+            raise HTTPException(status_code=404, detail=f"Event with ID {event_id} not found")
+            
+        # Check token ID
         if token_id < 1:
             raise HTTPException(status_code=400, detail="Invalid token ID")
 
+        event = events[event_id]
+        
         # Generate metadata for the token
         metadata = {
-            "name": f"{event_info['name']} - Ticket #{token_id}",
-            "description": f"Official ticket for {event_info['name']}",
-            "image": event_info['image'],
+            "name": f"{event['name']} - Ticket #{token_id}",
+            "description": f"Official ticket for {event['name']}",
+            "image": event['image'],
             "attributes": [
                 {
                     "trait_type": "Event Name",
-                    "value": event_info['name']
+                    "value": event['name']
                 },
                 {
                     "trait_type": "Location",
-                    "value": event_info['location']
+                    "value": event['location']
                 },
                 {
                     "trait_type": "Date",
-                    "value": datetime.fromtimestamp(event_info['time']).strftime('%Y-%m-%d')
+                    "value": datetime.fromtimestamp(event['time']).strftime('%Y-%m-%d')
                 },
                 {
                     "trait_type": "Ticket Number",
@@ -58,15 +78,25 @@ async def get_metadata(token_id: int):
                 },
                 {
                     "trait_type": "Event URL",
-                    "value": event_info['url']
+                    "value": event['url']
                 }
             ]
         }
         return metadata
     
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# For development/hackathon purposes
+@app.get("/events")
+async def get_all_events():
+    """Get all crypto events schedule"""
+    try:
+        return load_crypto_events()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
