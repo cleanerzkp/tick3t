@@ -30,7 +30,7 @@ contract EventTicketingTicketTest is Test {
             0.05 ether,
             owner,
             "https://api.example.com/metadata/",
-            "^.*@umons.ac.be$"
+            address(0)
         );
         vm.stopPrank();
     }
