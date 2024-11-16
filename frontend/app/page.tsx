@@ -1,4 +1,6 @@
+// app/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   DynamicWidget,
@@ -22,31 +24,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Navbar from "@/components/ui/Navbar";
+import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
+import dynamic from 'next/dynamic';
+import EventTicketing from "./components/EventTicketing";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
-
     const signIn = async () => {
       if (!user) {
         await telegramSignIn({ forceCreateUser: true });
       }
       setIsLoading(false);
     };
-
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
+
+  useEffect(() => {
+    if (smartAccount) {
+      console.log('My Biconomy smart account', smartAccount);
+    }
+  }, [smartAccount]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center ">
       {/* <div className="text-[#fff] font-Ubuntu bg-[url('/bg.png')] bg-contain bg-no-repeat bg-center    grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8  mx-auto "></div> */}
       <Navbar />
       <div className="flex flex-col items-center justify-center text-center">
-        <AuroraBackground>
+       <AuroraBackground>
           <motion.div
             initial={{ opacity: 0.0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -78,6 +88,15 @@ export default function Main() {
             </Card>
           </motion.div>
         </AuroraBackground>
+
+        <div className="mt-6">
+          {isLoading ? <Spinner /> : <DynamicWidget />}
+        </div>
+        {smartAccount && (
+          <div className="mt-8 w-full max-w-4xl">
+            <EventTicketing smartAccount={smartAccount} />
+          </div>
+        )}
       </div>
     </div>
   );

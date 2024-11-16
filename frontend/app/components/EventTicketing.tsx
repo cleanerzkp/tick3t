@@ -1,0 +1,166 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { eventTicketContract } from '@/lib/eventTicket';
+import type { EventInfo } from '@/app/types/eventTicket';
+import { formatEther } from 'viem';
+import type { WalletClient } from 'viem';
+
+interface EventTicketingProps {
+  walletClient: WalletClient;
+}
+
+export default function EventTicketing({ walletClient }: EventTicketingProps) {
+  const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBuying, setIsBuying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [userOpHash, setUserOpHash] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEventInfo = async () => {
+      try {
+        const info = await eventTicketContract.getEventInfo();
+        setEventInfo(info);
+        setError(null);
+      } catch (err) {
+        setError("Failed to load event information");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEventInfo();
+    const interval = setInterval(fetchEventInfo, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleBuyTicket = async () => {
+    setIsBuying(true);
+    setError(null);
+    setTransactionHash(null);
+    setUserOpHash(null);
+
+    try {
+      console.log("Starting ticket purchase...");
+
+      const result = await eventTicketContract.buyTicket(walletClient);
+      console.log("Purchase result:", result);
+
+      if (result.success) {
+        setTransactionHash(result.transactionHash || null);
+        setUserOpHash(result.userOpHash || null);
+        
+        // Wait a bit before fetching updated info to allow for blockchain confirmation
+        setTimeout(async () => {
+          const updatedInfo = await eventTicketContract.getEventInfo();
+          setEventInfo(updatedInfo);
+        }, 5000);
+      } else {
+        setError(result.error || "Transaction failed. Please try again.");
+        console.error("Purchase failed:", result.error);
+      }
+    } catch (err) {
+      console.error("Transaction error:", err);
+      setError(
+        err instanceof Error 
+          ? `Transaction failed: ${err.message}` 
+          : "Failed to process transaction. Please try again."
+      );
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl">
+        <div className="animate-pulse flex flex-col items-center justify-center">
+          <div className="w-full h-64 bg-gray-700 rounded-lg mb-4"></div>
+          <div className="w-3/4 h-8 bg-gray-700 rounded mb-4"></div>
+          <div className="w-1/2 h-6 bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl">
+      {eventInfo && (
+        <>
+          <div className="mb-6">
+            <img
+              src={eventInfo.photo}
+              alt={eventInfo.name}
+              className="w-full h-64 object-cover rounded-lg mb-4"
+            />
+            <h1 className="text-2xl font-bold mb-2">{eventInfo.name}</h1>
+            <p className="text-gray-300 mb-2">{eventInfo.location}</p>
+            <p className="text-gray-300 mb-4">
+              {new Date(Number(eventInfo.time) * 1000).toLocaleString()}
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <p className="text-sm text-gray-300">Available Tickets</p>
+                <p className="text-xl font-bold">
+                  {Number(eventInfo.n_tickets - eventInfo.n_tickets_sold)}
+                </p>
+              </div>
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <p className="text-sm text-gray-300">Price</p>
+                <p className="text-xl font-bold">
+                  {formatEther(eventInfo.price)} ETH
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleBuyTicket}
+              disabled={isBuying || eventInfo.n_tickets_sold >= eventInfo.n_tickets}
+              className={`w-full py-3 px-6 rounded-lg font-semibold ${
+                isBuying || eventInfo.n_tickets_sold >= eventInfo.n_tickets
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {isBuying ? (
+                <span className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Processing...
+                </span>
+              ) : eventInfo.n_tickets_sold >= eventInfo.n_tickets ? (
+                'Sold Out'
+              ) : (
+                'Buy Ticket'
+              )}
+            </button>
+          </div>
+
+          {error && (
+            <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded-lg mt-4">
+              {error}
+            </div>
+          )}
+
+          {(transactionHash || userOpHash) && (
+            <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded-lg mt-4">
+              {transactionHash && (
+                <div>
+                  Transaction Hash: {transactionHash.slice(0, 10)}...{transactionHash.slice(-8)}
+                </div>
+              )}
+              {userOpHash && (
+                <div className="mt-2">
+                  User Operation Hash: {userOpHash.slice(0, 10)}...{userOpHash.slice(-8)}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
