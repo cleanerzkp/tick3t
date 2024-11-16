@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bot:dev": "ts-node telegram/index.ts"
   },
   "dependencies": {
     "@biconomy/account": "^4.5.7",
