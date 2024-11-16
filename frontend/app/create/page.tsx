@@ -5,9 +5,16 @@ import { useTelegramLogin, useDynamicContext } from "../../lib/dynamic";
 
 import Navbar from "@/components/ui/Navbar";
 import { useBiconomyAccount } from "../hooks/useBiconomyAccount.js";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
@@ -20,6 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
@@ -43,7 +51,6 @@ export default function Main() {
       console.log("My Biconomy smart account", smartAccount);
     }
   }, [smartAccount]);
-  const [date, setDate] = useState<Date>();
 
   const [imageSrc, setImageSrc] = useState<any>(null);
 
@@ -62,6 +69,44 @@ export default function Main() {
     fetchPFP();
   }, []);
 
+  const [formData, setFormData] = useState({
+    eventName: "",
+    description: "",
+    dateTime: "",
+    location: "",
+    minToken: "",
+    selectedToken: "",
+    locationHidden: false,
+  });
+
+  const handleInputChange = (e: any) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleDateTimeChange = (value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      dateTime: value,
+    }));
+  };
+
+  const handleTokenSelect = (value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedToken: value,
+    }));
+  };
+  const handleTokenLocationVisible = () => {
+    setFormData((prev) => ({
+      ...prev,
+      locationHidden: !prev.locationHidden,
+    }));
+  };
+
   return (
     <div className="min-h-screen  bg-neutral-950 pt-20   ">
       <Navbar />
@@ -77,16 +122,101 @@ export default function Main() {
         <div className="my-8 w-full ">
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
             <LabelInputContainer>
-              <Input id="firstname" placeholder="Event Name" type="text" />
+              <Input
+                id="eventName"
+                placeholder="Event Name"
+                type="text"
+                value={formData.eventName}
+                onChange={handleInputChange}
+              />
             </LabelInputContainer>
+
             <LabelInputContainer>
-              <Input id="lastname" placeholder="Description" type="text" />
+              <Input
+                id="description"
+                placeholder="Description"
+                type="text"
+                value={formData.description}
+                onChange={handleInputChange}
+              />
             </LabelInputContainer>
-            <DateTimePicker />
+
+            <DateTimePicker
+              date={formData?.dateTime}
+              setDate={handleDateTimeChange}
+            />
+
             <LabelInputContainer>
-              <Input id="location" placeholder="Location" type="text" />
+              <Input
+                id="location"
+                placeholder="Location"
+                type="text"
+                value={formData.location}
+                onChange={handleInputChange}
+              />
             </LabelInputContainer>
-            <Button>Create </Button>
+
+            <LabelInputContainer className="flex flex-row justify-between items-center">
+              <Input
+                id="minToken"
+                placeholder="Min Token"
+                type="text"
+                value={formData.minToken}
+                onChange={handleInputChange}
+              />
+              <Select onValueChange={handleTokenSelect}>
+                <SelectTrigger className="w-[180px] backdrop-blur-lg shadow-2xl bg-neutral-900 border-none text-[#ffffff90]">
+                  <SelectValue
+                    className="bg-neutral-950 text-[#ffffff90]"
+                    placeholder="Select Token"
+                  />
+                </SelectTrigger>
+                <SelectContent className="bg-neutral-950 text-[#ffffff90] border-none">
+                  <SelectGroup className="bg-neutral-950 text-[#ffffff90]">
+                    <SelectItem
+                      className="bg-neutral-950 text-[#ffffff90]"
+                      value="$SUP"
+                    >
+                      $SUP
+                    </SelectItem>
+                    <SelectItem
+                      className="bg-neutral-950 text-[#ffffff90]"
+                      value="$MKI"
+                    >
+                      $MKI
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </LabelInputContainer>
+            <div
+              className="items-top flex flex-row items-center space-x-2"
+              onClick={() => {
+                handleTokenLocationVisible();
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={formData.locationHidden}
+                onChange={handleTokenLocationVisible}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="terms1"
+                  className="text-sm text-[#ffffff90] py-2 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Location visible
+                </label>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => {
+                console.log("Form Data:", formData);
+              }}
+            >
+              Create
+            </Button>
           </div>
         </div>
       </div>
