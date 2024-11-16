@@ -9,7 +9,7 @@ import Spinner from "./Spinner";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/ui/Navbar";
-import { useBiconomyAccount } from "./hooks/useBiconomyAccount";
+import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "../components/ui/aurora-background";
 import EventTicketing from "./components/EventTicketing";
@@ -21,26 +21,36 @@ export default function Main() {
   const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
-    if (!sdkHasLoaded) return;
-    
+    console.log("SDK Loaded:", sdkHasLoaded);
+    console.log("User State:", user);
+
+    if (!sdkHasLoaded) {
+      console.log("SDK not yet loaded, skipping sign-in...");
+      return;
+    }
+
     const signIn = async () => {
       try {
         if (!user) {
+          console.log("Attempting Telegram sign-in...");
           await telegramSignIn({ forceCreateUser: true });
+          console.log("Telegram sign-in successful.");
         }
       } catch (error) {
-        console.error("Telegram sign in error:", error);
       } finally {
         setIsLoading(false);
+        console.log("Finished sign-in process. Loading state:", isLoading);
       }
     };
-    
+
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
 
   useEffect(() => {
     if (smartAccount) {
-      console.log('Smart account ready:', smartAccount);
+      console.log("Smart account initialized:", smartAccount);
+    } else {
+      console.warn("Smart account not initialized yet.");
     }
   }, [smartAccount]);
 
@@ -74,17 +84,30 @@ export default function Main() {
               </CardHeader>
               <CardContent className="grid gap-4">
                 <div className="mt-6 flex w-full items-center justify-center">
-                  {isLoading ? <Spinner /> : <DynamicWidget />}
+                  {isLoading ? (
+                    <>
+                      <Spinner />
+                      <p>Loading Dynamic Widget...</p>
+                    </>
+                  ) : (
+                    <>
+                      <DynamicWidget />
+                      <p>Dynamic Widget Loaded Successfully.</p>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </AuroraBackground>
         
-        {smartAccount && (
+        {smartAccount ? (
           <div className="mt-8 w-full max-w-4xl">
             <EventTicketing smartAccount={smartAccount} />
+            <p>Smart Account Component Rendered.</p>
           </div>
+        ) : (
+          <p>Waiting for Smart Account Initialization...</p>
         )}
       </div>
     </div>
