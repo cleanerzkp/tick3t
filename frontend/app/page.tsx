@@ -13,12 +13,14 @@ import { useBiconomyAccount } from "./hooks/useBiconomyAccount.js";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "../components/ui/aurora-background";
 import EventTicketing from "./components/EventTicketing";
+import { useEventTicketContract } from "@/lib/eventTicket";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
   const [isLoading, setIsLoading] = useState(true);
-  const { smartAccount } = useBiconomyAccount();
+  const { smartAccount, error: biconomyError } = useBiconomyAccount();
+  const { buyTicket } = useEventTicketContract(smartAccount);
 
   useEffect(() => {
     console.log("SDK Loaded:", sdkHasLoaded);
@@ -37,6 +39,8 @@ export default function Main() {
           console.log("Telegram sign-in successful.");
         }
       } catch (error) {
+        console.error("Telegram sign-in error:", error);
+        // Optionally set an error state here
       } finally {
         setIsLoading(false);
         console.log("Finished sign-in process. Loading state:", isLoading);
@@ -80,7 +84,7 @@ export default function Main() {
                     Welcome to Tick3t
                   </div>
                 </CardTitle>
-                <CardDescription>One Fucking solution.</CardDescription>
+                <CardDescription>One Solution.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
                 <div className="mt-6 flex w-full items-center justify-center">
@@ -96,18 +100,28 @@ export default function Main() {
                     </>
                   )}
                 </div>
+                {biconomyError && (
+                  <div className="mt-4 text-red-500">
+                    <p>Error initializing smart account: {biconomyError}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
         </AuroraBackground>
-        
+
         {smartAccount ? (
           <div className="mt-8 w-full max-w-4xl">
             <EventTicketing smartAccount={smartAccount} />
             <p>Smart Account Component Rendered.</p>
           </div>
         ) : (
-          <p>Waiting for Smart Account Initialization...</p>
+          !biconomyError && <p>Waiting for Smart Account Initialization...</p>
+        )}
+        {biconomyError && (
+          <div className="mt-4 text-red-500">
+            <p>Error initializing smart account: {biconomyError}</p>
+          </div>
         )}
       </div>
     </div>

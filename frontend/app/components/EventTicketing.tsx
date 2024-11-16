@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { eventTicketContract } from '@/lib/eventTicket';
-import type { EventInfo } from '@/app/types/eventTicket';
+import type { EventInfo } from '../types/eventTicket';
+import type { NexusClient } from '@biconomy/sdk';
 import { formatEther } from 'viem';
-import type { BiconomySmartAccountV2 } from "@biconomy/account";
+import { useEventTicketContract } from '@/lib/eventTicket';
 
 interface EventTicketingProps {
-  smartAccount: BiconomySmartAccountV2 | null;
+  smartAccount: NexusClient | null;
 }
 
 export default function EventTicketing({ smartAccount }: EventTicketingProps) {
@@ -18,10 +18,12 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const [userOpHash, setUserOpHash] = useState<string | null>(null);
 
+  const { getEventInfo, buyTicket } = useEventTicketContract(smartAccount);
+
   useEffect(() => {
     const fetchEventInfo = async () => {
       try {
-        const info = await eventTicketContract.getEventInfo();
+        const info = await getEventInfo();
         setEventInfo(info);
         setError(null);
       } catch (err) {
@@ -35,7 +37,7 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
     fetchEventInfo();
     const interval = setInterval(fetchEventInfo, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [getEventInfo]);
 
   const handleBuyTicket = async () => {
     if (!smartAccount) {
@@ -50,20 +52,15 @@ export default function EventTicketing({ smartAccount }: EventTicketingProps) {
 
     try {
       console.log("Starting ticket purchase with smart account...");
-      const address = await smartAccount.getAccountAddress();
-      console.log("Smart Account Address:", address);
-
-      const result = await eventTicketContract.buyTicket(smartAccount);
-      console.log("Purchase result:", result);
+      const result = await buyTicket();
 
       if (result.success) {
         setTransactionHash(result.transactionHash || null);
         setUserOpHash(result.userOpHash || null);
         
-        // Wait for blockchain confirmation before updating UI
         setTimeout(async () => {
           try {
-            const updatedInfo = await eventTicketContract.getEventInfo();
+            const updatedInfo = await getEventInfo();
             setEventInfo(updatedInfo);
           } catch (err) {
             console.error("Error updating event info:", err);
