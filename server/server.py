@@ -8,6 +8,16 @@ import subprocess
 import tempfile
 from pathlib import Path
 from pydantic import BaseModel
+# Add these imports and models at the top
+from pydantic import BaseModel
+import logging
+
+class EncryptRequest(BaseModel):
+    type: str  # 'tokens' or 'nft' or 'balance'
+    amount: float
+    contract_address: str
+    message: str
+
 
 app = FastAPI()
 
@@ -148,8 +158,95 @@ async def generate_proof():
             detail=f"Error generating proof: {str(e)}"
         )
 
+@app.post("/encrypt")
+async def encrypt_message(request: EncryptRequest):
+    """Execute Lit Protocol encryption script"""
+    try:
+        cmd = ["node", "scripts/lit_protocol_encrypt.js", request.type, str(request.amount), request.contract_address, request.message]
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=False,  # This will print directly to terminal
+            text=True
+        )
+        
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Encryption failed"
+            )
+            
+        return {"status": "success"}
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to encrypt message: {str(e)}"
+        )
+
+
+@app.post("/decrypt")
+async def decrypt_message():
+    """Execute Lit Protocol decryption script"""
+    try:
+        result = subprocess.run(
+            ["node", "scripts/lit_protocol_decrypt.js"],
+            capture_output=True,  # Capture the output
+            text=True
+        )
+        
+        # Print everything for debugging
+        print("STDOUT:", result.stdout)
+        print("STDERR:", result.stderr)
+        
+        # Parse the output
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Decryption failed: {result.stderr}"
+            )
+
+        try:
+            # Try to parse the last non-empty line
+            output_lines = [line for line in result.stdout.split('\n') if line.strip()]
+            if not output_lines:
+                raise HTTPException(
+                    status_code=500,
+                    detail="No output from decryption script"
+                )
+            
+            last_line = output_lines[-1]
+            print("Attempting to parse:", last_line)
+            
+            result_json = json.loads(last_line)
+            return {
+                "status": "success",
+                "message": result_json["decryptedMessage"] if "decryptedMessage" in result_json else result_json
+            }
+            
+        except json.JSONDecodeError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to parse JSON: {str(e)}, Output was: {last_line}"
+            )
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to decrypt message: {str(e)}"
+        )
+    
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # Configure logging
+    uvicorn.config.logger = logging.getLogger("uvicorn")
+    uvicorn.config.logger.handlers = []
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger("uvicorn")
+    
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+
 
 
     

@@ -33,19 +33,23 @@ class LitEncrypt {
    }
 
    encrypt = async (message) => {
+
+
       const accessControlConditions = [
         {
-          contractAddress: "",
-          standardContractType: "",
-          chain: "baseSepolia",
-          method: "eth_getBalance",
-          parameters: [":userAddress", "latest"],
+          contractAddress: '0xA80617371A5f511Bf4c1dDf822E6040acaa63e71',
+          standardContractType: 'ERC721',
+          chain,
+          method: 'balanceOf',
+          parameters: [
+            ':userAddress'
+          ],
           returnValueTest: {
-            comparator: ">=",
-            value: "1000000000000", // 0.000001 ETH
-          },
-        },
-      ];
+            comparator: '>',
+            value: '0'
+          }
+        }
+      ]
 
       // Create capacity delegation first
       const capacityDelegationAuthSig = await this.createCapacityDelegation();
@@ -76,9 +80,9 @@ async function main() {
     await litEncrypt.connect();
     console.log("Connected to Lit Protocol!");
 
-    const dummyMessage = "The event location is 221b Baker St, London NW1 6XE, United Kingdom";
+    const Message = "The event location is 221b Baker St, London NW1 6XE, United Kingdom";
     try {
-        const encryptedData = await litEncrypt.encrypt(dummyMessage);
+        const encryptedData = await litEncrypt.encrypt(Message);
         console.log("Encryption successful!");
         
         // Save to file
