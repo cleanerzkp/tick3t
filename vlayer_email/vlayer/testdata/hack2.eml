@@ -1,0 +1,211 @@
+Delivered-To: tanguyvans@gmail.com
+Received: by 2002:a05:622a:5da2:b0:45d:5c93:97ef with SMTP id fu34csp1720229qtb;
+        Sat, 16 Nov 2024 01:59:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFVLxI9Ad0klJoae6dAi0/lC5LwIiu4g5Yc3e3HhnXaL5epgcjxLo5DeKUq7r9sf9GQs0SI
+X-Received: by 2002:a17:902:ec85:b0:20c:f9ec:cd7f with SMTP id d9443c01a7336-211d0d5f6e1mr80998215ad.4.1731751148647;
+        Sat, 16 Nov 2024 01:59:08 -0800 (PST)
+ARC-Seal: i=2; a=rsa-sha256; t=1731751148; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=bdvAMb5JIaNjlbDMOSxDNy6PkEEPuNcHldAdl3FhkTnjkUHvoVoPrEdHz1kverXunp
+         F6R4eWCd6lykSmxPGDgmjju1jXMk8+qMyjPDNHvKJjGnfw4DaXFQ7WZHIOytpPA7iZiM
+         bMeKVqyDrcCB5HIbIQaapRNde/sBkRWOV7p9Yfr0T2vG0NJzldUoXU3hTSoxpAOz6gOl
+         FOYciT014mxp+wnCMK2izco0kjFsXvV3v/q9dvJEI1GzpplojltvhxMLrcWu9/wV+4wG
+         dDH0uQsgR5juXFZMf4zY74MAXa9LZ7qLB5N39wmR9fLpmi/ARL6agX8DkAN8i5T3JIkf
+         wiKw==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=mime-version:content-language:accept-language:message-id:date
+         :thread-index:thread-topic:subject:to:from:dkim-signature;
+        bh=j8TvcNOvaMW5hQA6XWeEQtVwl915nUZw2EiyJB+b7yg=;
+        fh=x8u27wXgzNT/h7CnuaHr3e9F1PP/c+JJLUfw+CdiI4I=;
+        b=VkmW/DwpG+o9vPdrwQP8DsJQ3P1+IBI0fcNEK2/nGKkiNXAtSEbdvanArsxDKhJ08l
+         h0LkU6JGOofoNouikvzOcnWGpOKoihGxN5hx+yEwf4j+Owjgg7FC1apx6Qidl6XRW1gw
+         sKRD6NFFM587fQjhh2ZDYPRBw3A8z+w6GmWoRzlCLPHH66iB6tPfTnWdsVsiKtliGd9p
+         Hl50mNgavRgFtj1FvIIHtR4hexWZWfRQoD5p0yWoYz4Oxt5+9pWAmsFkFikiu+ImWvFs
+         uP9ObeDMYP14gFZog9Jr09rXcDg1RSAroCSYg9nHUfnc0ScDnw4VyR6Oy/XWq6pugteu
+         OZSw==;
+        dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@umons.ac.be header.s=selector1 header.b=JxD1k1i7;
+       arc=pass (i=1 spf=pass spfdomain=umons.ac.be dkim=pass dkdomain=umons.ac.be dmarc=pass fromdomain=umons.ac.be);
+       spf=pass (google.com: domain of tanguy.vansnick@umons.ac.be designates 2a01:111:f403:c20f::7 as permitted sender) smtp.mailfrom=Tanguy.VANSNICK@umons.ac.be;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=umons.ac.be
+Return-Path: <Tanguy.VANSNICK@umons.ac.be>
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazlp170130007.outbound.protection.outlook.com. [2a01:111:f403:c20f::7])
+        by mx.google.com with ESMTPS id d9443c01a7336-211f077e186si13111485ad.89.2024.11.16.01.59.07
+        for <tanguyvans@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Nov 2024 01:59:08 -0800 (PST)
+Received-SPF: pass (google.com: domain of tanguy.vansnick@umons.ac.be designates 2a01:111:f403:c20f::7 as permitted sender) client-ip=2a01:111:f403:c20f::7;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@umons.ac.be header.s=selector1 header.b=JxD1k1i7;
+       arc=pass (i=1 spf=pass spfdomain=umons.ac.be dkim=pass dkdomain=umons.ac.be dmarc=pass fromdomain=umons.ac.be);
+       spf=pass (google.com: domain of tanguy.vansnick@umons.ac.be designates 2a01:111:f403:c20f::7 as permitted sender) smtp.mailfrom=Tanguy.VANSNICK@umons.ac.be;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=umons.ac.be
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W1YWAWC5bqCur4Wc/W3cUNp1p5W/rx4DGr2XiC9AMXLi4KAOX5ZniLPVYTosmov9LksOApqK090jD4N1Mgn6B63XKokuG75+0qJU8/ZO5m42gFRldvUMdosw6Hf+KfCFxRuPaZ0rOwtBWZM32WxtPNS6P96tE/d7bNdtqQmwRFuryZDDclnNG1nAVpeiWod1thgCHto8DQzLuZ7ydw9k0uagCyHFrNQ0LueSSPcXEchhBmDzc4FP0bm6Skc3rXdH0oN4kOneFkitSOd0ODN0ZLPdbVFW9S/9OSPEtqOMV6a8iwl8ZPy1S+4Cf+Xtvf4hYcaFAXMStCkII/5o/v/r7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j8TvcNOvaMW5hQA6XWeEQtVwl915nUZw2EiyJB+b7yg=;
+ b=FvP5rOCk6tnsv1URg1srGdPnCas/SSwLQlNo6jYGWe89O00q87T6kVTrQs5fZXmqj42gR0kjBEKVSauD6a+8A0LECg65P4OSVaEHwJ6iLYvfbJSq/Kwls05MlAoOF36oCcboXbzcV5g8Sme5i0PrNPbMS/KuhcPEkKToH6v63K4ymhSLVggoaMQmyrrG2bBe83wY4qA4cnn69vSZ82XjYMCRpRsBhFOIhHMKrXxIknqBjzF/NTwFS4prJA6W4kMbmsbKpG71xSUAVBTkHnJFTeg67G3nrHi7fv+dbLqE7/NmVOX9YSNGbn92QU/Dac4vzRk9WTMsSDKCaXS46pteyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=umons.ac.be; dmarc=pass action=none header.from=umons.ac.be;
+ dkim=pass header.d=umons.ac.be; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=umons.ac.be;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j8TvcNOvaMW5hQA6XWeEQtVwl915nUZw2EiyJB+b7yg=;
+ b=JxD1k1i75kb8Z19Fgy4hSBsGhrkyMKgeWpz0AClQXqWpyH3XHUzDxKG2zvE6eB6NkXPVMsWj/bW9dCWkKZXsJP2N+FYbDFQLb+fEi4SGthytnWAsC75n5lMfQSRQjwtyfgiktJrWELaziAK4GokjgLQeNUpSgIpYBwFzB447PhQ=
+Received: from PAXPR01MB9457.eurprd01.prod.exchangelabs.com
+ (2603:10a6:102:2c0::14) by PR3PR01MB8037.eurprd01.prod.exchangelabs.com
+ (2603:10a6:102:174::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.19; Sat, 16 Nov
+ 2024 09:59:03 +0000
+Received: from PAXPR01MB9457.eurprd01.prod.exchangelabs.com
+ ([fe80::a49:e765:26ad:e5eb]) by PAXPR01MB9457.eurprd01.prod.exchangelabs.com
+ ([fe80::a49:e765:26ad:e5eb%3]) with mapi id 15.20.8158.017; Sat, 16 Nov 2024
+ 09:59:01 +0000
+From: Tanguy VANSNICK <Tanguy.VANSNICK@umons.ac.be>
+To: "tanguyvans@gmail.com" <tanguyvans@gmail.com>
+Subject: Event Hacakathon
+Thread-Topic: Event Hacakathon
+Thread-Index: AQHbOA4WEUK+ZNs0J0Gm3vFX7bFWvQ==
+Date: Sat, 16 Nov 2024 09:59:00 +0000
+Message-ID:
+ <PAXPR01MB9457FDECC3618C6ABB14D778AE252@PAXPR01MB9457.eurprd01.prod.exchangelabs.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-reactions: allow
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=umons.ac.be;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR01MB9457:EE_|PR3PR01MB8037:EE_
+x-ms-office365-filtering-correlation-id: bdf8e269-3981-473a-c68b-08dd06254bb6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|8096899003|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?8zgucXCQgvDuSGxvZeO63ojnaQUQ/1D5NQRVU4jyNA065QaU/rC2NAW8Cu9B?=
+ =?us-ascii?Q?BMbsI3XNl/r9ibiDi4V/fhNsZnB3nkNv11q49iZkiUu13FXaKuk6oa8yDGgq?=
+ =?us-ascii?Q?MQOf3AL4Vc4s7uu0FUl5KhBLessA1BR35OKxqwv+k33EppEKLgfNDNBQATVx?=
+ =?us-ascii?Q?MLF9IBZyU7oUjWFx0SrT7hBH/PvX+w6QxkrHTCBVp5BtJvxeWw75s7wMg7eB?=
+ =?us-ascii?Q?joYudaWpEAgX5HFdFVTjJHF0NInDt64cRD91gUMhqgD84vhmC9SMZWahI390?=
+ =?us-ascii?Q?fIPS6x8G6+PLcyUnKdc4KHSsLw90adOZkg7UQ2lnkRILOv69SRslABn7UR4o?=
+ =?us-ascii?Q?zsx9Q1LjeoAtWvePpp02xtVmTjdyPf39Fg0GY3rGJ+vx0KFpW81ATfvik5Xy?=
+ =?us-ascii?Q?/7YtwKUGErL0NBpI/EWU8Bf7jwqeriQOP0SmK0lfz1YMz1osMPZ9KSZ8jtCh?=
+ =?us-ascii?Q?1vLZu4DzNWR4KqvdBnbgQ5O6156QDh5z9FH69r3saxpcsi6vzAvH4h0fNtPv?=
+ =?us-ascii?Q?QUSkubpk3lRrtcI+K3Lbmg1xcFwALYX9unuJzOxUXSHSLZrksJlPEtDUY0gu?=
+ =?us-ascii?Q?U0rjofkqHNsMFfgXxQ65hI7ScQssXLKOX0Z/sB98DlAgVFzWrt7wjvByw7Km?=
+ =?us-ascii?Q?VHc46E5/ALviZ7KvFrGnm6iYurhQqAeDfPnjwnqiXPWGVoDttm4v0bd3BxCK?=
+ =?us-ascii?Q?nQOqlgmetGVq3EvB81QIjmfTmARwmhJM5xuW/U05MoL8sjqy4e4LawXq/VHv?=
+ =?us-ascii?Q?SOLjjpnSHCyTbfUVTJ4qxC6i+OnrVH8d+QDpDNqAxIB+lPQkZSWHtfTn0FqM?=
+ =?us-ascii?Q?QxvZ/Wd4xapre9X+f24///IZAde6LIJjbR2XcM3m8QUWnO0BQ50vzlo/KgPH?=
+ =?us-ascii?Q?g9rmauFTNF0i5h/BOkeSCVupKos6eIKo0cl1ex1xh7E33KCjc3dDzTEgh7mo?=
+ =?us-ascii?Q?Iy5H3TBjd06u7ZZwyCZ1Jt+TbMsyp+JRWBJZZI32VQGgA6EyVTobntX4JoHu?=
+ =?us-ascii?Q?HPkECjDm77NTbOIg0CnfMJG2ap9FinaprpiXw6h+tahGv+4Iwp9Cm5KDOTQ1?=
+ =?us-ascii?Q?8dxz0f1ZbU2xXkuPiUHhWzsW4sEfKwZflUVHnd6F0wJzRGaAlTs=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:fr;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR01MB9457.eurprd01.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(8096899003)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?sb2EwKGQQeMVh2Cc7/FBwB/QDy+O58Q35MIh0zZs6N7gZrBSdIhwrH1fxSBr?=
+ =?us-ascii?Q?5dqlW5A/Um4Aiplles65bRzToYCEBb4j9gJiwfxQEalNfb8ZHmtYhd7u0w/S?=
+ =?us-ascii?Q?eCo54w2dyoxzTaygKbn6qGXNPmvXJ/sM3QtbxRQUw3vbMToc9gqcQ0yz5fk3?=
+ =?us-ascii?Q?bgd3nTy/CUEDwvgotBiDgtdK+mushjGUyZX5mXkX90/gbRXaJCjH+sAJAXGh?=
+ =?us-ascii?Q?xKahyuyqH93lEGZsiyqPBZvhK1dLuTQqTnzvLDyHp5ps8idgQ5zbERitk4T3?=
+ =?us-ascii?Q?x4/YAIfFF8gJ8ITqOGmd900LuyPcoLeBuoSlYv6LKy44sxAdFujSgkPPcLYn?=
+ =?us-ascii?Q?qRSH0Ix5Q7/oaqZrPoWPB8UDFCq7kjCmOrds8A0b4Luq23H5YVL9sBhulBAF?=
+ =?us-ascii?Q?f8677siSZ718So/2BRRoUH1nfkXXLIB+uWT8Dfy53bc6p3+AMAqrtJsT9LKs?=
+ =?us-ascii?Q?3sA/AvnwQ+Y6OG0Jmmvnfk4sUeMESGlCc5G8rXtAbkIwKt35UzaWXBlNPSfT?=
+ =?us-ascii?Q?zcyyXJeyd4pVOQLIljZvngImeadW+YQepccRndj+JTbpgbvq1TOauI1aTRV1?=
+ =?us-ascii?Q?ZH3zHHNzpbZ5Ep+752loURMX0TwmechwvkEJ1MlWT9K6XnL29sfZCz2sXaOJ?=
+ =?us-ascii?Q?kDyU+DUJPoX6S3TvlmRQD+2bF/Qzxn2PTGm8Nc+gED+G+h5+jGI+42/bdiOd?=
+ =?us-ascii?Q?rNVB/VTN8VRZGYYxtkdxGBU719jucFKu+sfUpo3+SwnuNyYZIhn9yo82Eg5L?=
+ =?us-ascii?Q?5Tvf48XKhZy5die37hWRDvn2Z7kRnno1CRL8Xu3sfnccU6WGmSzjfsarIm3n?=
+ =?us-ascii?Q?VD4QlZsLL/lpCGvt935ZlVlyhfEL1+aqQTYoxTmjscBsexhw4LrJTbWg9DO9?=
+ =?us-ascii?Q?bGNd60a9WOp6IDKbcVEF484TpwOyHYQEg+HGdVGFNJx3qTwhN029J0l2b52e?=
+ =?us-ascii?Q?IgZILSXXxd7exf+CcfpL62vN26+VVwozCtxupWtFQjlDew6/yQuK3PLDJnSK?=
+ =?us-ascii?Q?XmTyUrxhbbslbfPCNHfMnZwY+jR0Z0gOnaF7UsYBKIUYYToM0i7wnVhsHROZ?=
+ =?us-ascii?Q?ooQR/Mi/S2UxgPlfQWPaghQBO+vsOKjiy3Q0E53hkxK5txRKm/E+7IRcJO5o?=
+ =?us-ascii?Q?oDY+RV5vLVQu9XAjV1QAjb/VUTuDxzJxUKvbYUa9n6UUDXcrF095B7X6IaVv?=
+ =?us-ascii?Q?4Pg2GnLcUiFsm2xFfVDfc53O4Sb3H37/qwySSzTkYLvLXpXTrmCc8/PcuhCs?=
+ =?us-ascii?Q?TM8oWY0tQMiRDPmS4KGx0MEfhcaxB7M4C/aWR6nB2zCT0EoatH3dDu00Jw/5?=
+ =?us-ascii?Q?lgSMTnHJ5Kk7wBUtX5XDTj6k6XAlyBiJteMLWN9ZnHPr7DUNl51C6Ca7LFDd?=
+ =?us-ascii?Q?npD1xjbdUNoShAFXh5AZE7NfQ/iwZSTBUkuokVzEzVO/tXlNSji8uJGNSd4p?=
+ =?us-ascii?Q?2fr8U+xAJvfXq3R+u/nVOeGwwQoDlq4vbd4yDv5ob2Cgb7VoYyK4eA+EyIT8?=
+ =?us-ascii?Q?8YKAEd+ZsBB5j0VkhOFoXCycn0McX2Fve0Ud+NkMnXJWfatl4JA4DRSBGBax?=
+ =?us-ascii?Q?tgCGQATLILu2i0PlDcK2mCS+zAYzlZkyMux7EID7?=
+Content-Type: multipart/alternative;
+	boundary="_000_PAXPR01MB9457FDECC3618C6ABB14D778AE252PAXPR01MB9457eurp_"
+MIME-Version: 1.0
+X-OriginatorOrg: umons.ac.be
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR01MB9457.eurprd01.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdf8e269-3981-473a-c68b-08dd06254bb6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2024 09:59:00.9719
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 488bed9d-d6a7-48d5-ba1f-ebec3823b357
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: E8cW/eGM4OFABGfAe35GTAx2G98IcDEr1dAQlhAxW0fPN3/J1+BEZkFR33/ahG0DRo4PYKAGolp5KnzSRb/v5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR01MB8037
+
+--_000_PAXPR01MB9457FDECC3618C6ABB14D778AE252PAXPR01MB9457eurp_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+Coucou
+
+--_000_PAXPR01MB9457FDECC3618C6ABB14D778AE252PAXPR01MB9457eurp_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" xmlns:w=3D"urn:sc=
+hemas-microsoft-com:office:word" xmlns:m=3D"http://schemas.microsoft.com/of=
+fice/2004/12/omml" xmlns=3D"http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Aptos;
+	panose-1:2 11 0 4 2 2 2 2 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	font-size:11.0pt;
+	font-family:"Aptos",sans-serif;
+	mso-ligatures:standardcontextual;
+	mso-fareast-language:EN-US;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Aptos",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:11.0pt;
+	mso-fareast-language:EN-US;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style>
+</head>
+<body lang=3D"FR-BE" link=3D"#467886" vlink=3D"#96607D" style=3D"word-wrap:=
+break-word">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span lang=3D"NL">Coucou<o:p></o:p></span></p>
+</div>
+</body>
+</html>
+
+--_000_PAXPR01MB9457FDECC3618C6ABB14D778AE252PAXPR01MB9457eurp_--
