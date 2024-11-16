@@ -90,7 +90,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                         <p className="text-[14px]    text-[hsla(0,0%,100%,.5)]">
                           By {eventItem.organiser}
                         </p>
-                        <p className="text-[14px] flex flex-row gap-1 items-center   text-[hsla(0,0%,100%,.5)]">
+                        <div className="text-[14px] flex flex-row gap-1 items-center   text-[hsla(0,0%,100%,.5)]">
                           <div className="w-4 h-4">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +110,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                             </svg>
                           </div>{" "}
                           {eventItem.location}
-                        </p>
+                        </div>
                         <p className="text-[14px] w-fit   text-white bg-[#3cbd2c]  px-[4px] rounded-[4px]">
                           {eventItem.status}
                         </p>

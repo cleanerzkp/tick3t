@@ -21,6 +21,7 @@ import { AuroraBackground } from "../components/ui/aurora-background";
 import dynamic from "next/dynamic";
 import EventTicketing from "./components/EventTicketing";
 import { useEventTicketContract } from "@/lib/eventTicket";
+import { useRouter } from "next/navigation";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
@@ -28,6 +29,7 @@ export default function Main() {
   const [isLoading, setIsLoading] = useState(true);
   const { smartAccount, error: biconomyError } = useBiconomyAccount();
   const { buyTicket } = useEventTicketContract(smartAccount);
+  const navigate = useRouter();
 
   useEffect(() => {
     console.log("SDK Loaded:", sdkHasLoaded);
@@ -64,7 +66,12 @@ export default function Main() {
       console.warn("Smart account not initialized yet.");
     }
   }, [smartAccount]);
-
+  useEffect(() => {
+    if (user?.verifiedCredentials[0].address) {
+      //navigate to home if already logged in
+      navigate.push("/Home");
+    }
+  }, [user]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center">
       <Navbar />
@@ -103,7 +110,6 @@ export default function Main() {
                   ) : (
                     <>
                       <DynamicWidget />
-                      <p>Dynamic Widget Loaded Successfully.</p>
                     </>
                   )}
                 </div>
