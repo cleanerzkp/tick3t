@@ -2,5 +2,9 @@
     "name": "email-proof-generator",
     "version": "1.0.0",
     "type": "module",
-    "main": "generate_email_proof.js"
-  }
+    "main": "generate_email_proof.js",
+    "dependencies": {
+        "@lit-protocol/lit-node-client": "^6.11.2",
+        "dotenv": "^16.4.5"
+    }
+}
