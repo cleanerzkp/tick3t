@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "../src/EventTicketingFactoryNFTsEmail.sol";
 
 contract EventFactoryTest is Test {
-    EventFactory public factory;
+    EventFactoryNFTsEmail public factory;
     address public owner;
     address public user1;
     address public user2;
@@ -17,7 +17,7 @@ contract EventFactoryTest is Test {
         user2 = makeAddr("user2");
 
         vm.startPrank(owner);
-        factory = new EventFactory();
+        factory = new EventFactoryNFTsEmail();
         vm.stopPrank();
     }
 
@@ -33,7 +33,6 @@ contract EventFactoryTest is Test {
         uint256 nTickets = 100;
         uint256 price = 0.1 ether;
         string memory uri = "https://api.example.com/metadata/";
-        string memory emailRegex = "^.*@umons.ac.be$";
 
         // Create event
         address eventAddress = factory.createEvent(
@@ -45,7 +44,7 @@ contract EventFactoryTest is Test {
             nTickets,
             price,
             uri,
-            emailRegex
+            address(0)
         );
 
         // Verify event creation
@@ -77,7 +76,7 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri1",
-            ""
+            address(0)
         );
 
         address event2 = factory.createEvent(
@@ -89,7 +88,7 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri2",
-            ""
+            address(0)
         );
 
         address event3 = factory.createEvent(
@@ -101,8 +100,10 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri3",
-            ""
+            address(0)
         );
+
+        assertNotEq(event2, event3);
 
         // Get events in next 2 days
         address[] memory upcomingEvents = factory.getUpcomingEvents(2 days);
@@ -129,7 +130,7 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri",
-            ""
+            address(0)
         );
 
         // Verify it's in future events
@@ -171,7 +172,7 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri1",
-            ""
+            address(0)
         );
 
         factory.createEvent(
@@ -183,7 +184,7 @@ contract EventFactoryTest is Test {
             100,
             0.1 ether,
             "uri2",
-            ""
+            address(0)
         );
 
         // Check updated counts

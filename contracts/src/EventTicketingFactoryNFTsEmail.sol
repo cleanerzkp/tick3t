@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 import "./EventTicketingNFT_Email.sol";
 
-contract EventFactory {
+contract EventFactoryNFTsEmail {
     event EventCreated(address eventAddress, address owner, uint256 eventTime);
     event EventMovedToPast(address eventAddress);
     
@@ -23,7 +23,7 @@ contract EventFactory {
         uint256 _n_tickets,
         uint256 _price,
         string memory uri,
-        string memory _email_regex //"^.*@umons.ac.be$"
+        address _emailVerifier 
     ) public returns (address) {
         EventTicketing newEvent = new EventTicketing(
             _name,
@@ -35,7 +35,7 @@ contract EventFactory {
             _price,
             msg.sender,
             uri,
-            _email_regex 
+            _emailVerifier 
         );
         
         address eventAddress = address(newEvent);
