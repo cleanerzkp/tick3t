@@ -116,11 +116,11 @@ export default function Main() {
                     </>
                   )}
                 </div>
-                {biconomyError && (
+                {/* {biconomyError && (
                   <div className="mt-4 text-red-500">
                     <p>Error initializing smart account: {biconomyError}</p>
                   </div>
-                )}
+                )} */}
               </CardContent>
             </Card>
           </motion.div>
@@ -134,11 +134,11 @@ export default function Main() {
         ) : (
           !biconomyError && <p>Waiting for Smart Account Initialization...</p>
         )}
-        {biconomyError && (
+        {/* {biconomyError && (
           <div className="mt-4 text-red-500">
             <p>Error initializing smart account: {biconomyError}</p>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
