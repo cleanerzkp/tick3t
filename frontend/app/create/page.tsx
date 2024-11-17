@@ -28,13 +28,14 @@ import { cn } from "@/lib/utils";
 
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { EventTicketingTestAbi } from "../../../contracts/abis/EventTicketingTest2";
+import { useRouter } from "next/navigation";
 
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const navigate = useRouter();
   useEffect(() => {
     if (!sdkHasLoaded) return;
     const signIn = async () => {
@@ -254,11 +255,10 @@ export default function Main() {
             </Button>
             <Button
               onClick={() => {
-                console.log("Form Data:", formData);
-                buyTicket();
+                navigate.push("/view");
               }}
             >
-              buy
+              View
             </Button>
           </div>
         </div>
