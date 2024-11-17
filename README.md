@@ -9,6 +9,18 @@ Privacy-first on-chain event ticketing platform with gasless transactions and sm
 - **Privacy Preservation**: ZK technology for private events and selective information disclosure
 - **Multi-chain Support**: Deploy and manage events across multiple networks
 
+
+## Deployed contracts
+
+| Contract | Network | Address | Etherscan Verified |
+| --------------- | --------------- | --- | ----- |
+| Event Factory  | Base Sepolia  | [0x439AEfC24D2BD67470891B5AAc2663ba0d148cf1](https://base-sepolia.blockscout.com/address/0x439AEfC24D2BD67470891B5AAc2663ba0d148cf1)  | :white_check_mark:  |
+| Email Verifier  | Base Sepolia  | [0xc6178EEeD9dA5253D040388a9f300374648c303c](https://base-sepolia.blockscout.com/address/0xc6178EEeD9dA5253D040388a9f300374648c303c)  | :white_check_mark:  |
+| Email Prover  | Base Sepolia  | [0xc500a04866c94639F1b82fB3c1d35c76903FbB35](https://base-sepolia.blockscout.com/address/0xc500a04866c94639F1b82fB3c1d35c76903FbB35)  | :white_check_mark:  |
+| Event Factory  | Scroll Sepolia  | [0x7133cf0d4597f39ffa0e5dd19144800fd49ec47b](https://sepolia.scrollscan.com/address/0x7133cf0d4597f39ffa0e5dd19144800fd49ec47b)  | :white_check_mark:  |
+
+
+
 ## 🏗️ Project Structure
 
 ```

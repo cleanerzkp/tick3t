@@ -78,13 +78,46 @@ contract EventTicketing is ERC721 {
         return eventInfo;
     }
 
-    function buy(Proof calldata emailProof) public payable {
+    function buyWithProof(Proof calldata emailProof) public payable {
         require(block.timestamp < eventInfo.time, "Event has already passed");
         require(eventInfo.n_tickets_sold < eventInfo.n_tickets, "Event is sold out");
         require(!hasTicket(msg.sender), "Address already has a ticket");
         if (emailVerifier!=address(0)){
             IEmailProofVerifier(emailVerifier).verify(emailProof);
         }
+
+        // Check payment only if price is greater than 0
+        if(eventInfo.price > 0) {
+            require(msg.value >= eventInfo.price, "Insufficient payment");
+        } else {
+            // If someone sends ETH for a free event, revert
+            require(msg.value == 0, "Event is free, no payment required");
+        }
+
+        // Increment ticket counter
+        eventInfo.n_tickets_sold += 1;
+        
+        // Mint NFT
+        _tokenIds++;
+        uint256 newTokenId = _tokenIds;
+        _safeMint(msg.sender, newTokenId);
+        
+        // Assign ticket number
+        ticketNumbers[newTokenId] = eventInfo.n_tickets_sold;
+        
+        emit TicketMinted(msg.sender, newTokenId, eventInfo.n_tickets_sold);
+        
+        // Return excess payment if any
+        if (msg.value > eventInfo.price) {
+            payable(msg.sender).transfer(msg.value - eventInfo.price);
+        }
+    }
+
+    function buy() public payable {
+        require(block.timestamp < eventInfo.time, "Event has already passed");
+        require(eventInfo.n_tickets_sold < eventInfo.n_tickets, "Event is sold out");
+        require(!hasTicket(msg.sender), "Address already has a ticket");
+        require(emailVerifier==address(0), "You need to provide email proof");
 
         // Check payment only if price is greater than 0
         if(eventInfo.price > 0) {

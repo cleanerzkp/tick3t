@@ -1,3 +1,7 @@
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.27;
+
 // Local Utilities
 import {AddressParser} from "./utils/AddressParser.sol";
 import {Prover} from "vlayer-0.1.0/Prover.sol";

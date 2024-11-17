@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.27;
 
 import {EmailProver} from "./EmailProver.sol";
 import {Proof} from "vlayer-0.1.0/Proof.sol";
 import {Verifier} from "vlayer-0.1.0/Verifier.sol";
 
-contract EmailProofVerifier is Verifier {
+contract EmailVerifier is Verifier {
     address public prover;
 
     constructor(address _prover) {
