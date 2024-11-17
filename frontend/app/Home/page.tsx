@@ -57,7 +57,7 @@ export default function Main() {
         {
           time: "10:00 AM",
           title: "Web3 Devrel Night @Devcon",
-          description: "This is event 1",
+          description: "This is event   1",
           organiser: "aave",
           location: "The Avani bangkok",
           img: "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/event-covers/4v/6b147b0e-d610-451c-bcb0-143fd2b66178",
