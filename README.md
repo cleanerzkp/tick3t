@@ -108,4 +108,3 @@ Built with support from:
 - Dynamic (Authentication)
 - Base (L2 Scaling)
 - Lit Protocol (Privacy)
-- ??? add otehrs pls
