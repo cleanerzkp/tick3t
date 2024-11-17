@@ -1,7 +1,7 @@
 import { encodeFunctionData, Address, parseEther } from "viem";
 import { baseSepolia } from "viem/chains";
 import { usePublicClient } from "wagmi";
-import { EventTicketingTestAbi } from "../../contracts/abis/EventTicketingTest2";
+import EventTicketing from "../abi/EventTicketing.json";
 import type { NexusClient } from "@biconomy/sdk";
 
 export interface EventInfo {
@@ -22,7 +22,8 @@ export interface TransactionResult {
   error?: string;
 }
 
-const CONTRACT_ADDRESS = "0x7133CF0D4597F39FFA0E5Dd19144800FD49EC47B" as Address;
+const CONTRACT_ADDRESS =
+  "0x5f4d8829aD312232ac32dfe79A4DD50D5B47D273" as Address;
 
 export function useEventTicketContract(nexusClient: NexusClient | null) {
   const publicClient = usePublicClient({
@@ -32,13 +33,13 @@ export function useEventTicketContract(nexusClient: NexusClient | null) {
   const getEventInfo = async (): Promise<EventInfo> => {
     try {
       if (!publicClient) throw new Error("Public client not configured");
-      
+
       const data = await publicClient.readContract({
         address: CONTRACT_ADDRESS,
-        abi: EventTicketingTestAbi.abi,
+        abi: EventTicketing.abi,
         functionName: "getEventInfo",
       });
-      
+
       return data as unknown as EventInfo;
     } catch (error) {
       console.error("Error fetching event info:", error);
@@ -57,26 +58,28 @@ export function useEventTicketContract(nexusClient: NexusClient | null) {
     try {
       // Encode the function call data
       const data = encodeFunctionData({
-        abi: EventTicketingTestAbi.abi,
+        abi: EventTicketing.abi,
         functionName: "buy",
         args: [],
       });
 
       // Create the call exactly like in the Nexus SDK example
       const hash = await nexusClient.sendTransaction({
-        calls: [{
-          to: CONTRACT_ADDRESS,
-          data,
-          value: parseEther("0.01"), // 0.01 ETH - matches your original value
-        }]
+        calls: [
+          {
+            to: "0x5f4d8829aD312232ac32dfe79A4DD50D5B47D273",
+            data,
+            // value: parseEther("0.01"), // 0.01 ETH - matches your original value
+          },
+        ],
       });
       console.log("Transaction hash:", hash);
 
       // Wait for receipt exactly like in the Nexus SDK example
       const receipt = await nexusClient.waitForTransactionReceipt({
-        hash
+        hash,
       });
-      console.log("Transaction receipt:", receipt);
+      console.log("Transactionss receipt:", receipt);
 
       return {
         success: true,

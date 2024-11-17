@@ -1,11 +1,16 @@
 // app/page.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTelegramLogin, useDynamicContext } from "../../lib/dynamic";
 
 import Navbar from "@/components/ui/Navbar";
 import { useBiconomyAccount } from "../hooks/useBiconomyAccount.js";
-
+import EventFactoryAbi from "../../abi/EventFactoryNFTsEmail.json";
+import {
+  EventInfo,
+  TransactionResult,
+  useEventTicketContract,
+} from "@/lib/eventTicket";
 import {
   Select,
   SelectContent,
@@ -15,24 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { type Address, encodeFunctionData } from "viem";
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { EventTicketingTestAbi } from "../../../contracts/abis/EventTicketingTest2";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 export default function Main() {
   const { sdkHasLoaded, user } = useDynamicContext();
   const { telegramSignIn } = useTelegramLogin();
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { smartAccount } = useBiconomyAccount();
 
   useEffect(() => {
     if (!sdkHasLoaded) return;
@@ -45,7 +46,40 @@ export default function Main() {
     console.log("user", user);
     signIn();
   }, [sdkHasLoaded, telegramSignIn, user]);
+  const { smartAccount, error: biconomyError }: any = useBiconomyAccount();
+  const { buyTicket } = useEventTicketContract(smartAccount);
+  async function CreateEvent() {
+    const data = encodeFunctionData({
+      abi: EventFactoryAbi.abi,
+      functionName: "createEvent",
+      args: [
+        formData.eventName,
+        formData.description,
+        12999999999999,
+        formData.location,
+        imageSrc,
+        10,
+        0,
+        "https://7bbe-210-1-49-172.ngrok-free.app/metadata/1",
+        "0x0000000000000000000000000000000000000000",
+      ],
+    });
+    const hash = await smartAccount.sendTransaction({
+      calls: [
+        {
+          to: "0x439AEfC24D2BD67470891B5AAc2663ba0d148cf1",
+          data,
+        },
+      ],
+    });
+    console.log("Transaction hash:", hash);
 
+    const receipt = await smartAccount.waitForTransactionReceipt({
+      hash,
+    });
+
+    console.log("Transaction receipt:", receipt);
+  }
   useEffect(() => {
     if (smartAccount) {
       console.log("My Biconomy smart account", smartAccount);
@@ -213,9 +247,18 @@ export default function Main() {
             <Button
               onClick={() => {
                 console.log("Form Data:", formData);
+                CreateEvent();
               }}
             >
               Create
+            </Button>
+            <Button
+              onClick={() => {
+                console.log("Form Data:", formData);
+                buyTicket();
+              }}
+            >
+              buy
             </Button>
           </div>
         </div>

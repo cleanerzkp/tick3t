@@ -83,7 +83,11 @@ export default function EventViewer() {
               />
               <h3 className="text-2xl font-bold mb-2">{eventData.name}</h3>
               <p className="text-gray-300">
-                <a href={eventData.url} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={eventData.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {eventData.url}
                 </a>
               </p>
@@ -91,8 +95,7 @@ export default function EventViewer() {
                 Location: {eventData.location}
               </p>
               <p className="text-gray-400 mb-4">
-                Time:{" "}
-                {new Date(Number(eventData.time) * 1000).toLocaleString()}
+                Time: {new Date(Number(eventData.time) * 1000).toLocaleString()}
               </p>
               <p className="text-gray-400 mb-2">
                 Tickets Sold: {eventData.n_tickets_sold.toString()} /{" "}
